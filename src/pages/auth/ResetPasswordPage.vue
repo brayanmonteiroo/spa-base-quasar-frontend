@@ -25,23 +25,45 @@
 
           <q-input
             v-model="password"
-            type="password"
+            :type="showPassword ? 'text' : 'password'"
             label="Nova senha"
             outlined
             dense
+            autocomplete="new-password"
             :rules="[
               val => (val && val.length >= 8) || 'Mínimo de 8 caracteres'
             ]"
-          />
+          >
+            <template #append>
+              <q-icon
+                :name="showPassword ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="showPassword = !showPassword"
+              />
+            </template>
+          </q-input>
 
           <q-input
             v-model="passwordConfirmation"
-            type="password"
+            :type="showPasswordConfirmation ? 'text' : 'password'"
             label="Confirmar senha"
             outlined
             dense
+            autocomplete="new-password"
             :rules="[val => val === password || 'As senhas não coincidem']"
-          />
+          >
+            <template #append>
+              <q-icon
+                :name="
+                  showPasswordConfirmation ? 'visibility_off' : 'visibility'
+                "
+                class="cursor-pointer"
+                @click="
+                  showPasswordConfirmation = !showPasswordConfirmation
+                "
+              />
+            </template>
+          </q-input>
 
           <div
             class="row items-center q-col-gutter-sm"
@@ -94,6 +116,8 @@ const token = ref(
 );
 const password = ref("");
 const passwordConfirmation = ref("");
+const showPassword = ref(false);
+const showPasswordConfirmation = ref(false);
 const isSubmitting = ref(false);
 
 async function onSubmit(): Promise<void> {
