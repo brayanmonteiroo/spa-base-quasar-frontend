@@ -18,7 +18,8 @@
       :rows="rows"
       :columns="columns"
       :loading="isLoading"
-      :pagination="pagination"
+      v-model:pagination="pagination"
+      :rows-per-page-options="[5, 10, 15, 25, 50]"
       @request="onRequest"
     >
       <template #body-cell-actions="props">
@@ -79,22 +80,25 @@ const columns: QTableColumn[] = [
 ];
 
 const pagination = ref({
+  sortBy: "name",
+  descending: false,
   page: 1,
   rowsPerPage: 15,
   rowsNumber: 0
 });
 
-async function loadUsers(page = 1): Promise<void> {
+async function loadUsers(
+  page = pagination.value.page,
+  rowsPerPage = pagination.value.rowsPerPage
+): Promise<void> {
   isLoading.value = true;
 
   try {
-    const response = await fetchUsers(page);
+    const response = await fetchUsers(page, rowsPerPage);
     rows.value = response.data;
-    pagination.value = {
-      page: response.meta.current_page,
-      rowsPerPage: response.meta.per_page,
-      rowsNumber: response.meta.total
-    };
+    pagination.value.page = response.meta.current_page;
+    pagination.value.rowsPerPage = response.meta.per_page;
+    pagination.value.rowsNumber = response.meta.total;
   } catch (error) {
     Notify.create({
       type: "negative",
@@ -109,7 +113,11 @@ async function loadUsers(page = 1): Promise<void> {
 }
 
 const onRequest: QTableProps["onRequest"] = ({ pagination: next }) => {
-  void loadUsers(next.page);
+  pagination.value = {
+    ...pagination.value,
+    ...next
+  };
+  void loadUsers(next.page, next.rowsPerPage);
 };
 
 function confirmDelete(user: AuthUser): void {
@@ -123,7 +131,7 @@ function confirmDelete(user: AuthUser): void {
       try {
         await deleteUser(user.id);
         Notify.create({ type: "positive", message: "Usuário removido." });
-        await loadUsers(pagination.value.page);
+        await loadUsers();
       } catch (error) {
         Notify.create({
           type: "negative",

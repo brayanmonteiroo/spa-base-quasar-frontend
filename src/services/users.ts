@@ -24,9 +24,12 @@ export interface UserPayload {
   password_confirmation?: string;
 }
 
-export async function fetchUsers(page = 1): Promise<PaginatedUsers> {
+export async function fetchUsers(
+  page = 1,
+  perPage = 15
+): Promise<PaginatedUsers> {
   const { data } = await api.get<PaginatedUsers>("/api/admin/users", {
-    params: { page }
+    params: { page, per_page: perPage }
   });
   return data;
 }
