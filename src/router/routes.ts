@@ -1,21 +1,63 @@
-import type { RouteRecordRaw } from 'vue-router';
+import type { RouteRecordRaw } from "vue-router";
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/',
-    component: () => import('@/layouts/MainLayout.vue'),
+    path: "/",
+    component: () => import("@/layouts/GuestLayout.vue"),
+    meta: { guest: true },
     children: [
-      { path: '', component: () => import('@/pages/IndexPage.vue') },
-      { path: 'second', component: () => import('@/pages/SecondPage.vue') }
-    ],
+      {
+        path: "",
+        name: "login",
+        component: () => import("@/pages/auth/LoginPage.vue")
+      },
+      {
+        path: "forgot-password",
+        name: "forgot-password",
+        component: () => import("@/pages/auth/ForgotPasswordPage.vue")
+      },
+      {
+        path: "reset-password",
+        name: "reset-password",
+        component: () => import("@/pages/auth/ResetPasswordPage.vue")
+      }
+    ]
   },
-
-  // Always leave this as last one,
-  // but you can also remove it
   {
-    path: '/:catchAll(.*)*',
-    component: () => import('@/pages/ErrorNotFound.vue'),
+    path: "/admin",
+    component: () => import("@/layouts/AdminLayout.vue"),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "",
+        redirect: { name: "admin-dashboard" }
+      },
+      {
+        path: "dashboard",
+        name: "admin-dashboard",
+        component: () => import("@/pages/admin/DashboardPage.vue")
+      },
+      {
+        path: "users",
+        name: "admin-users",
+        component: () => import("@/pages/admin/users/UsersIndexPage.vue")
+      },
+      {
+        path: "users/create",
+        name: "admin-users-create",
+        component: () => import("@/pages/admin/users/UserCreatePage.vue")
+      },
+      {
+        path: "users/:id/edit",
+        name: "admin-users-edit",
+        component: () => import("@/pages/admin/users/UserEditPage.vue")
+      }
+    ]
   },
+  {
+    path: "/:catchAll(.*)*",
+    component: () => import("@/pages/ErrorNotFound.vue")
+  }
 ];
 
 export default routes;
