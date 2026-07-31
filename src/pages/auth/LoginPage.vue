@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center bg-grey-2 q-pa-md">
+  <q-page class="flex flex-center q-pa-md">
     <q-card class="auth-card full-width q-pa-sm">
       <q-card-section>
         <div class="text-h5 text-weight-medium">Entrar</div>

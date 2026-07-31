@@ -17,6 +17,15 @@
 
         <q-space />
 
+        <q-btn
+          flat
+          round
+          dense
+          :icon="darkIcon"
+          :aria-label="isDark ? 'Ativar modo claro' : 'Ativar modo escuro'"
+          @click="toggleDark"
+        />
+
         <q-btn flat round dense icon="account_circle" aria-label="Conta">
           <q-menu>
             <q-list style="min-width: 180px; max-width: 90vw">
@@ -81,9 +90,11 @@ import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Notify, useQuasar } from "quasar";
 import { useAuthStore } from "@/stores/auth";
+import { useDarkMode } from "@/composables/useDarkMode";
 import { getApiErrorMessage } from "@/utils/api-error";
 
 const auth = useAuthStore();
+const { isDark, icon: darkIcon, toggle: toggleDark } = useDarkMode();
 const router = useRouter();
 const route = useRoute();
 const $q = useQuasar();
