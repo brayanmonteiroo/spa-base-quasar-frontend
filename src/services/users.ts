@@ -26,7 +26,7 @@ export interface UserPayload {
 
 export async function fetchUsers(
   page = 1,
-  perPage = 15
+  perPage = 10
 ): Promise<PaginatedUsers> {
   const { data } = await api.get<PaginatedUsers>("/api/admin/users", {
     params: { page, per_page: perPage }

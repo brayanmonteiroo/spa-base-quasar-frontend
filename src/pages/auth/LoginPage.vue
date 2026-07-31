@@ -1,6 +1,6 @@
 <template>
-  <q-page class="flex flex-center bg-grey-2">
-    <q-card class="q-pa-md" style="width: 100%; max-width: 420px">
+  <q-page class="flex flex-center bg-grey-2 q-pa-md">
+    <q-card class="auth-card full-width q-pa-sm">
       <q-card-section>
         <div class="text-h5 text-weight-medium">Entrar</div>
         <div class="text-caption text-grey-7 q-mt-xs">
@@ -40,21 +40,29 @@
 
           <q-checkbox v-model="remember" label="Lembrar-me" dense />
 
-          <div class="row items-center justify-between">
-            <router-link
-              class="text-primary text-caption"
-              :to="{ name: 'forgot-password' }"
-            >
-              Esqueci minha senha
-            </router-link>
+          <div
+            class="row items-center q-col-gutter-sm"
+            :class="$q.screen.lt.sm ? 'column reverse' : 'justify-between'"
+          >
+            <div class="col-auto">
+              <router-link
+                class="text-primary text-caption"
+                :to="{ name: 'forgot-password' }"
+              >
+                Esqueci minha senha
+              </router-link>
+            </div>
 
-            <q-btn
-              type="submit"
-              color="primary"
-              label="Entrar"
-              :loading="isSubmitting"
-              unelevated
-            />
+            <div class="col-12 col-sm-auto">
+              <q-btn
+                class="full-width"
+                type="submit"
+                color="primary"
+                label="Entrar"
+                :loading="isSubmitting"
+                unelevated
+              />
+            </div>
           </div>
         </q-form>
       </q-card-section>
@@ -65,10 +73,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { Notify } from "quasar";
+import { Notify, useQuasar } from "quasar";
 import { useAuthStore } from "@/stores/auth";
 import { getApiErrorMessage } from "@/utils/api-error";
 
+const $q = useQuasar();
 const auth = useAuthStore();
 const router = useRouter();
 const route = useRoute();

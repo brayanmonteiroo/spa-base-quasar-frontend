@@ -4,7 +4,7 @@
 
     <q-inner-loading :showing="isLoading" />
 
-    <q-card v-if="!isLoading" flat bordered style="max-width: 560px">
+    <q-card v-if="!isLoading" flat bordered class="full-width form-card">
       <q-card-section>
         <q-form class="q-gutter-md" @submit.prevent="onSubmit">
           <q-input
@@ -43,15 +43,25 @@
             ]"
           />
 
-          <div class="row q-gutter-sm">
-            <q-btn
-              type="submit"
-              color="primary"
-              label="Salvar"
-              :loading="isSubmitting"
-              unelevated
-            />
-            <q-btn flat label="Cancelar" :to="{ name: 'admin-users' }" />
+          <div class="row q-col-gutter-sm">
+            <div class="col-12 col-sm-auto">
+              <q-btn
+                class="full-width"
+                type="submit"
+                color="primary"
+                label="Salvar"
+                :loading="isSubmitting"
+                unelevated
+              />
+            </div>
+            <div class="col-12 col-sm-auto">
+              <q-btn
+                class="full-width"
+                flat
+                label="Cancelar"
+                :to="{ name: 'admin-users' }"
+              />
+            </div>
           </div>
         </q-form>
       </q-card-section>

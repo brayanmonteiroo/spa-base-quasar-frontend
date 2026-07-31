@@ -2,7 +2,7 @@
   <q-page padding>
     <div class="text-h5 q-mb-md">Novo usuário</div>
 
-    <q-card flat bordered style="max-width: 560px">
+    <q-card flat bordered class="full-width form-card">
       <q-card-section>
         <q-form class="q-gutter-md" @submit.prevent="onSubmit">
           <q-input
@@ -26,7 +26,9 @@
             label="Senha"
             outlined
             dense
-            :rules="[val => (val && val.length >= 8) || 'Mínimo de 8 caracteres']"
+            :rules="[
+              val => (val && val.length >= 8) || 'Mínimo de 8 caracteres'
+            ]"
           />
           <q-input
             v-model="form.password_confirmation"
@@ -39,19 +41,25 @@
             ]"
           />
 
-          <div class="row q-gutter-sm">
-            <q-btn
-              type="submit"
-              color="primary"
-              label="Criar"
-              :loading="isSubmitting"
-              unelevated
-            />
-            <q-btn
-              flat
-              label="Cancelar"
-              :to="{ name: 'admin-users' }"
-            />
+          <div class="row q-col-gutter-sm">
+            <div class="col-12 col-sm-auto">
+              <q-btn
+                class="full-width"
+                type="submit"
+                color="primary"
+                label="Criar"
+                :loading="isSubmitting"
+                unelevated
+              />
+            </div>
+            <div class="col-12 col-sm-auto">
+              <q-btn
+                class="full-width"
+                flat
+                label="Cancelar"
+                :to="{ name: 'admin-users' }"
+              />
+            </div>
           </div>
         </q-form>
       </q-card-section>

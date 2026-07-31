@@ -11,15 +11,23 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title>SPA Base Admin</q-toolbar-title>
+        <q-toolbar-title shrink class="ellipsis">
+          SPA Base Admin
+        </q-toolbar-title>
 
-        <q-btn flat round dense icon="account_circle">
+        <q-space />
+
+        <q-btn flat round dense icon="account_circle" aria-label="Conta">
           <q-menu>
-            <q-list style="min-width: 180px">
+            <q-list style="min-width: 180px; max-width: 90vw">
               <q-item>
                 <q-item-section>
-                  <q-item-label>{{ auth.user?.name }}</q-item-label>
-                  <q-item-label caption>{{ auth.user?.email }}</q-item-label>
+                  <q-item-label class="ellipsis">{{
+                    auth.user?.name
+                  }}</q-item-label>
+                  <q-item-label caption class="ellipsis">{{
+                    auth.user?.email
+                  }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-separator />
@@ -35,7 +43,13 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+      :breakpoint="1023"
+      :width="260"
+    >
       <q-list padding>
         <q-item-label header>Menu</q-item-label>
 
@@ -63,20 +77,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { Notify } from "quasar";
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { Notify, useQuasar } from "quasar";
 import { useAuthStore } from "@/stores/auth";
 import { getApiErrorMessage } from "@/utils/api-error";
 
 const auth = useAuthStore();
 const router = useRouter();
+const route = useRoute();
+const $q = useQuasar();
 const leftDrawerOpen = ref(false);
 
 const links = [
   { label: "Painel", icon: "dashboard", to: { name: "admin-dashboard" } },
   { label: "Usuários", icon: "people", to: { name: "admin-users" } }
 ] as const;
+
+watch(
+  () => route.fullPath,
+  () => {
+    if ($q.screen.lt.md) {
+      leftDrawerOpen.value = false;
+    }
+  }
+);
 
 function toggleLeftDrawer(): void {
   leftDrawerOpen.value = !leftDrawerOpen.value;
