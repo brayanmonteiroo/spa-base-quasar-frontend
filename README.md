@@ -110,13 +110,13 @@ docker compose -f compose.dev.yaml exec quasar npm run ci:check
 
 Scripts npm:
 
-| Script | O que faz |
-|--------|-----------|
-| `npm run lint` | oxfmt (escreve) + oxlint `--fix` |
+| Script               | O que faz                             |
+| -------------------- | ------------------------------------- |
+| `npm run lint`       | oxfmt (escreve) + oxlint `--fix`      |
 | `npm run lint:check` | oxfmt `--check` + oxlint (não altera) |
-| `npm run typecheck` | `vue-tsc --noEmit` |
-| `npm run build` | `quasar build` |
-| `npm run ci:check` | `lint:check` + `typecheck` + `build` |
+| `npm run typecheck`  | `vue-tsc --noEmit`                    |
+| `npm run build`      | `quasar build`                        |
+| `npm run ci:check`   | `lint:check` + `typecheck` + `build`  |
 
 ### GitHub Actions
 
