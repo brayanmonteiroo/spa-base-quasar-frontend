@@ -26,7 +26,27 @@
           @click="toggleDark"
         />
 
-        <q-btn flat round dense icon="account_circle" aria-label="Conta">
+        <q-btn
+          flat
+          dense
+          no-caps
+          class="q-px-sm"
+          :aria-label="accountAriaLabel"
+        >
+          <div class="row items-center no-wrap">
+            <q-avatar
+              color="primary"
+              text-color="white"
+              size="32px"
+              font-size="14px"
+            >
+              {{ initials }}
+            </q-avatar>
+            <span class="q-ml-sm gt-xs ellipsis admin-shell__account-name">{{
+              auth.user?.name
+            }}</span>
+            <q-icon name="arrow_drop_down" size="20px" class="q-ml-xs" />
+          </div>
           <q-menu>
             <q-list style="min-width: 180px; max-width: 90vw">
               <q-item>
@@ -102,6 +122,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useDarkMode } from "@/composables/useDarkMode";
 import { Permission } from "@/constants/permissions";
 import { getApiErrorMessage } from "@/utils/api-error";
+import { userInitials } from "@/utils/user-initials";
 import AppBreadcrumbs from "@/components/navigation/AppBreadcrumbs.vue";
 
 interface NavLink {
@@ -122,6 +143,11 @@ const router = useRouter();
 const route = useRoute();
 const $q = useQuasar();
 const leftDrawerOpen = ref(false);
+
+const initials = computed(() => userInitials(auth.user?.name));
+const accountAriaLabel = computed(() =>
+  auth.user?.name ? `Conta de ${auth.user.name}` : "Conta"
+);
 
 const navSections: NavSection[] = [
   {
@@ -284,6 +310,10 @@ body.body--dark .admin-shell .q-header .q-layout__shadow {
 // Breadcrumbs: logo abaixo do header, alinhado ao padding da página
 .admin-shell__page-top {
   padding: 16px 32px 0;
+}
+
+.admin-shell__account-name {
+  max-width: 12rem;
 }
 
 @media (max-width: 599px) {
