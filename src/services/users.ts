@@ -1,5 +1,6 @@
 import { api } from "@/boot/axios";
 import type { AuthUser } from "@/stores/auth";
+import type { TableListParams } from "@/types/table";
 
 export interface PaginatedUsers {
   data: AuthUser[];
@@ -25,12 +26,23 @@ export interface UserPayload {
   roles: string[];
 }
 
+export interface FetchUsersParams extends TableListParams {
+  q?: string;
+  role?: string;
+}
+
 export async function fetchUsers(
-  page = 1,
-  perPage = 10
+  params: FetchUsersParams = {}
 ): Promise<PaginatedUsers> {
   const { data } = await api.get<PaginatedUsers>("/api/admin/users", {
-    params: { page, per_page: perPage }
+    params: {
+      page: params.page ?? 1,
+      per_page: params.per_page ?? 10,
+      sort: params.sort,
+      direction: params.direction,
+      q: params.q || undefined,
+      role: params.role || undefined
+    }
   });
   return data;
 }

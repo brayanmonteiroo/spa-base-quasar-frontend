@@ -126,7 +126,7 @@ onMounted(async () => {
   isRolesLoading.value = true;
 
   try {
-    const response = await fetchRoles(1, 100);
+    const response = await fetchRoles({ page: 1, per_page: 100 });
     roleOptions.value = response.data.map(role => ({
       label: role.label,
       value: role.name

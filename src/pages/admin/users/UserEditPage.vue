@@ -178,7 +178,7 @@ onMounted(async () => {
   try {
     const [user, rolesResponse] = await Promise.all([
       fetchUser(userId),
-      fetchRoles(1, 100)
+      fetchRoles({ page: 1, per_page: 100 })
     ]);
 
     form.name = user.name;

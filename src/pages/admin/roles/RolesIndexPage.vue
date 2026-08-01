@@ -18,6 +18,24 @@
       </div>
     </div>
 
+    <TableFilters
+      :active-count="activeFilterCount"
+      @apply="applyFilters"
+      @clear="clearFilters"
+    >
+      <div class="col-12 col-sm-6 col-md-4">
+        <q-input
+          v-model="draft.q"
+          label="Buscar"
+          dense
+          clearable
+          outlined
+          hint="Nome ou rótulo (ex.: Administrador)"
+          @keyup.enter="applyFilters"
+        />
+      </div>
+    </TableFilters>
+
     <q-table
       class="roles-table full-width"
       flat
@@ -137,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import {
   Dialog,
   Notify,
@@ -145,15 +163,31 @@ import {
   type QTableColumn,
   type QTableProps
 } from "quasar";
+import TableFilters from "@/components/table/TableFilters.vue";
 import { useAuthStore } from "@/stores/auth";
 import { Permission } from "@/constants/permissions";
 import { deleteRole, fetchRoles, type Role } from "@/services/roles";
+import { sortDirectionFromDescending } from "@/types/table";
 import { getApiErrorMessage } from "@/utils/api-error";
+
+interface RoleFilters {
+  q: string;
+}
 
 const $q = useQuasar();
 const auth = useAuthStore();
 const rows = ref<Role[]>([]);
 const isLoading = ref(false);
+
+const draft = reactive<RoleFilters>({
+  q: ""
+});
+
+const applied = reactive<RoleFilters>({
+  q: ""
+});
+
+const activeFilterCount = computed(() => (applied.q.trim() !== "" ? 1 : 0));
 
 const columns = computed((): QTableColumn[] => {
   const cols: QTableColumn[] = [
@@ -196,14 +230,17 @@ const pagination = ref({
   rowsNumber: 0
 });
 
-async function loadRoles(
-  page = pagination.value.page,
-  rowsPerPage = pagination.value.rowsPerPage
-): Promise<void> {
+async function loadRoles(): Promise<void> {
   isLoading.value = true;
 
   try {
-    const response = await fetchRoles(page, rowsPerPage);
+    const response = await fetchRoles({
+      page: pagination.value.page,
+      per_page: pagination.value.rowsPerPage,
+      ...(pagination.value.sortBy ? { sort: pagination.value.sortBy } : {}),
+      direction: sortDirectionFromDescending(pagination.value.descending),
+      ...(applied.q.trim() !== "" ? { q: applied.q.trim() } : {})
+    });
     rows.value = response.data;
     pagination.value.page = response.meta.current_page;
     pagination.value.rowsPerPage = response.meta.per_page;
@@ -223,8 +260,21 @@ const onRequest: QTableProps["onRequest"] = ({ pagination: next }) => {
     ...pagination.value,
     ...next
   };
-  void loadRoles(next.page, next.rowsPerPage);
+  void loadRoles();
 };
+
+function applyFilters(): void {
+  applied.q = draft.q;
+  pagination.value.page = 1;
+  void loadRoles();
+}
+
+function clearFilters(): void {
+  draft.q = "";
+  applied.q = "";
+  pagination.value.page = 1;
+  void loadRoles();
+}
 
 function confirmDelete(role: Role): void {
   Dialog.create({

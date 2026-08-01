@@ -18,6 +18,37 @@
       </div>
     </div>
 
+    <TableFilters
+      :active-count="activeFilterCount"
+      @apply="applyFilters"
+      @clear="clearFilters"
+    >
+      <div class="col-12 col-sm-6 col-md-4">
+        <q-input
+          v-model="draft.q"
+          label="Buscar"
+          dense
+          clearable
+          outlined
+          hint="Nome ou e-mail"
+          @keyup.enter="applyFilters"
+        />
+      </div>
+      <div class="col-12 col-sm-6 col-md-4">
+        <q-select
+          v-model="draft.role"
+          :options="roleOptions"
+          label="Perfil"
+          dense
+          clearable
+          outlined
+          emit-value
+          map-options
+          options-dense
+        />
+      </div>
+    </TableFilters>
+
     <q-table
       class="users-table full-width"
       flat
@@ -137,7 +168,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import {
   Dialog,
   Notify,
@@ -145,16 +176,44 @@ import {
   type QTableColumn,
   type QTableProps
 } from "quasar";
+import TableFilters from "@/components/table/TableFilters.vue";
 import { useAuthStore, type AuthUser } from "@/stores/auth";
 import { Permission } from "@/constants/permissions";
-import { roleLabel } from "@/constants/role-labels";
+import { RoleLabel, roleLabel } from "@/constants/role-labels";
+import { fetchRoles } from "@/services/roles";
 import { deleteUser, fetchUsers } from "@/services/users";
+import { sortDirectionFromDescending } from "@/types/table";
 import { getApiErrorMessage } from "@/utils/api-error";
+
+interface UserFilters {
+  q: string;
+  role: string | null;
+}
 
 const $q = useQuasar();
 const auth = useAuthStore();
 const rows = ref<AuthUser[]>([]);
 const isLoading = ref(false);
+const roleOptions = ref<{ label: string; value: string }[]>(
+  Object.entries(RoleLabel).map(([value, label]) => ({ label, value }))
+);
+
+const draft = reactive<UserFilters>({
+  q: "",
+  role: null
+});
+
+const applied = reactive<UserFilters>({
+  q: "",
+  role: null
+});
+
+const activeFilterCount = computed(() => {
+  let count = 0;
+  if (applied.q.trim() !== "") count += 1;
+  if (applied.role) count += 1;
+  return count;
+});
 
 function formatRoles(roles: string[]): string {
   if (roles.length === 0) {
@@ -218,14 +277,18 @@ const pagination = ref({
   rowsNumber: 0
 });
 
-async function loadUsers(
-  page = pagination.value.page,
-  rowsPerPage = pagination.value.rowsPerPage
-): Promise<void> {
+async function loadUsers(): Promise<void> {
   isLoading.value = true;
 
   try {
-    const response = await fetchUsers(page, rowsPerPage);
+    const response = await fetchUsers({
+      page: pagination.value.page,
+      per_page: pagination.value.rowsPerPage,
+      ...(pagination.value.sortBy ? { sort: pagination.value.sortBy } : {}),
+      direction: sortDirectionFromDescending(pagination.value.descending),
+      ...(applied.q.trim() !== "" ? { q: applied.q.trim() } : {}),
+      ...(applied.role ? { role: applied.role } : {})
+    });
     rows.value = response.data;
     pagination.value.page = response.meta.current_page;
     pagination.value.rowsPerPage = response.meta.per_page;
@@ -248,8 +311,24 @@ const onRequest: QTableProps["onRequest"] = ({ pagination: next }) => {
     ...pagination.value,
     ...next
   };
-  void loadUsers(next.page, next.rowsPerPage);
+  void loadUsers();
 };
+
+function applyFilters(): void {
+  applied.q = draft.q;
+  applied.role = draft.role;
+  pagination.value.page = 1;
+  void loadUsers();
+}
+
+function clearFilters(): void {
+  draft.q = "";
+  draft.role = null;
+  applied.q = "";
+  applied.role = null;
+  pagination.value.page = 1;
+  void loadUsers();
+}
 
 function confirmDelete(user: AuthUser): void {
   Dialog.create({
@@ -276,7 +355,24 @@ function confirmDelete(user: AuthUser): void {
   });
 }
 
+async function loadRoleOptions(): Promise<void> {
+  if (!auth.can(Permission.RolesView)) {
+    return;
+  }
+
+  try {
+    const response = await fetchRoles({ page: 1, per_page: 100 });
+    roleOptions.value = response.data.map(role => ({
+      label: role.label,
+      value: role.name
+    }));
+  } catch {
+    // Keep static RoleLabel fallback.
+  }
+}
+
 onMounted(() => {
+  void loadRoleOptions();
   void loadUsers();
 });
 </script>

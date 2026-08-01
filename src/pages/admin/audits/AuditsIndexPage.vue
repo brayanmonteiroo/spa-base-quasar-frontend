@@ -2,6 +2,62 @@
   <q-page padding>
     <div class="text-h5 q-mb-md">Auditoria</div>
 
+    <TableFilters
+      :active-count="activeFilterCount"
+      @apply="applyFilters"
+      @clear="clearFilters"
+    >
+      <div class="col-12 col-sm-6 col-md-3">
+        <q-select
+          v-model="draft.event"
+          :options="eventOptions"
+          label="Evento"
+          dense
+          clearable
+          outlined
+          emit-value
+          map-options
+          options-dense
+        />
+      </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <q-select
+          v-model="draft.user_id"
+          :options="userOptions"
+          label="Usuário"
+          dense
+          clearable
+          outlined
+          emit-value
+          map-options
+          options-dense
+          :loading="isLoadingUsers"
+        />
+      </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <q-input
+          v-model="draft.from"
+          label="De"
+          type="date"
+          dense
+          clearable
+          outlined
+          stack-label
+        />
+      </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <q-input
+          v-model="draft.to"
+          label="Até"
+          type="date"
+          dense
+          clearable
+          outlined
+          stack-label
+        />
+      </div>
+    </TableFilters>
+
     <q-table
       class="audits-table full-width"
       flat
@@ -69,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import {
   Dialog,
   Notify,
@@ -77,12 +133,59 @@ import {
   type QTableColumn,
   type QTableProps
 } from "quasar";
+import TableFilters from "@/components/table/TableFilters.vue";
+import { Permission } from "@/constants/permissions";
 import { fetchAudits, type AuditEntry } from "@/services/audits";
+import { fetchUsers } from "@/services/users";
+import { useAuthStore } from "@/stores/auth";
+import { sortDirectionFromDescending } from "@/types/table";
 import { getApiErrorMessage } from "@/utils/api-error";
 
+interface AuditFilters {
+  event: string | null;
+  user_id: number | null;
+  from: string;
+  to: string;
+}
+
+const eventOptions = [
+  { label: "Criado", value: "created" },
+  { label: "Atualizado", value: "updated" },
+  { label: "Excluído", value: "deleted" },
+  { label: "Restaurado", value: "restored" },
+  { label: "Perfis atualizados", value: "roles_updated" },
+  { label: "Vínculos atualizados", value: "sync" }
+] as const;
+
 const $q = useQuasar();
+const auth = useAuthStore();
 const rows = ref<AuditEntry[]>([]);
 const isLoading = ref(false);
+const isLoadingUsers = ref(false);
+const userOptions = ref<{ label: string; value: number }[]>([]);
+
+const draft = reactive<AuditFilters>({
+  event: null,
+  user_id: null,
+  from: "",
+  to: ""
+});
+
+const applied = reactive<AuditFilters>({
+  event: null,
+  user_id: null,
+  from: "",
+  to: ""
+});
+
+const activeFilterCount = computed(() => {
+  let count = 0;
+  if (applied.event) count += 1;
+  if (applied.user_id) count += 1;
+  if (applied.from) count += 1;
+  if (applied.to) count += 1;
+  return count;
+});
 
 function formatUser(user: AuditEntry["user"]): string {
   if (!user) {
@@ -137,6 +240,7 @@ const columns = computed((): QTableColumn[] => {
       label: "Data",
       field: (row: AuditEntry) => formatDate(row.created_at),
       align: "left",
+      sortable: true,
       style: "min-width: 160px"
     },
     {
@@ -150,6 +254,7 @@ const columns = computed((): QTableColumn[] => {
       label: "Evento",
       field: "event_label",
       align: "left",
+      sortable: true,
       style: "width: 120px"
     },
     {
@@ -189,14 +294,20 @@ const pagination = ref({
   rowsNumber: 0
 });
 
-async function loadAudits(
-  page = pagination.value.page,
-  rowsPerPage = pagination.value.rowsPerPage
-): Promise<void> {
+async function loadAudits(): Promise<void> {
   isLoading.value = true;
 
   try {
-    const response = await fetchAudits(page, rowsPerPage);
+    const response = await fetchAudits({
+      page: pagination.value.page,
+      per_page: pagination.value.rowsPerPage,
+      ...(pagination.value.sortBy ? { sort: pagination.value.sortBy } : {}),
+      direction: sortDirectionFromDescending(pagination.value.descending),
+      ...(applied.event ? { event: applied.event } : {}),
+      ...(applied.user_id ? { user_id: applied.user_id } : {}),
+      ...(applied.from ? { from: applied.from } : {}),
+      ...(applied.to ? { to: applied.to } : {})
+    });
     rows.value = response.data;
     pagination.value.page = response.meta.current_page;
     pagination.value.rowsPerPage = response.meta.per_page;
@@ -219,10 +330,53 @@ const onRequest: QTableProps["onRequest"] = ({ pagination: next }) => {
     ...pagination.value,
     ...next
   };
-  void loadAudits(next.page, next.rowsPerPage);
+  void loadAudits();
 };
 
+function applyFilters(): void {
+  applied.event = draft.event;
+  applied.user_id = draft.user_id;
+  applied.from = draft.from;
+  applied.to = draft.to;
+  pagination.value.page = 1;
+  void loadAudits();
+}
+
+function clearFilters(): void {
+  draft.event = null;
+  draft.user_id = null;
+  draft.from = "";
+  draft.to = "";
+  applied.event = null;
+  applied.user_id = null;
+  applied.from = "";
+  applied.to = "";
+  pagination.value.page = 1;
+  void loadAudits();
+}
+
+async function loadUserOptions(): Promise<void> {
+  if (!auth.can(Permission.UsersView)) {
+    return;
+  }
+
+  isLoadingUsers.value = true;
+
+  try {
+    const response = await fetchUsers({ page: 1, per_page: 100 });
+    userOptions.value = response.data.map(user => ({
+      label: `${user.name} (${user.email})`,
+      value: user.id
+    }));
+  } catch {
+    // Select stays empty when users cannot be loaded.
+  } finally {
+    isLoadingUsers.value = false;
+  }
+}
+
 onMounted(() => {
+  void loadUserOptions();
   void loadAudits();
 });
 </script>

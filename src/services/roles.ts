@@ -1,5 +1,6 @@
 import { api } from "@/boot/axios";
 import type { PermissionCatalogSection } from "@/constants/permission-catalog";
+import type { TableListParams } from "@/types/table";
 
 export interface Role {
   id: number;
@@ -33,12 +34,21 @@ export interface RolePayload {
   permissions: string[];
 }
 
+export interface FetchRolesParams extends TableListParams {
+  q?: string;
+}
+
 export async function fetchRoles(
-  page = 1,
-  perPage = 10
+  params: FetchRolesParams = {}
 ): Promise<PaginatedRoles> {
   const { data } = await api.get<PaginatedRoles>("/api/admin/roles", {
-    params: { page, per_page: perPage }
+    params: {
+      page: params.page ?? 1,
+      per_page: params.per_page ?? 10,
+      sort: params.sort,
+      direction: params.direction,
+      q: params.q || undefined
+    }
   });
   return data;
 }

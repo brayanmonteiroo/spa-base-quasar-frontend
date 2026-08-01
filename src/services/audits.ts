@@ -1,4 +1,5 @@
 import { api } from "@/boot/axios";
+import type { TableListParams } from "@/types/table";
 
 export interface AuditUser {
   id: number;
@@ -38,12 +39,27 @@ export interface PaginatedAudits {
   };
 }
 
+export interface FetchAuditsParams extends TableListParams {
+  event?: string;
+  user_id?: number | null;
+  from?: string;
+  to?: string;
+}
+
 export async function fetchAudits(
-  page = 1,
-  perPage = 10
+  params: FetchAuditsParams = {}
 ): Promise<PaginatedAudits> {
   const { data } = await api.get<PaginatedAudits>("/api/admin/audits", {
-    params: { page, per_page: perPage }
+    params: {
+      page: params.page ?? 1,
+      per_page: params.per_page ?? 10,
+      sort: params.sort,
+      direction: params.direction,
+      event: params.event || undefined,
+      user_id: params.user_id || undefined,
+      from: params.from || undefined,
+      to: params.to || undefined
+    }
   });
   return data;
 }
