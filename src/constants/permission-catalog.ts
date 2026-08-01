@@ -31,7 +31,8 @@ export const permissionCatalogSections: PermissionCatalogSection[] = [
         label: "Painel",
         permissions: [
           { name: Permission.DashboardSidebar, label: "Menu" },
-          { name: Permission.DashboardView, label: "Visualizar" }
+          { name: Permission.DashboardView, label: "Visualizar" },
+          { name: Permission.DashboardCards, label: "Cards" }
         ]
       }
     ]

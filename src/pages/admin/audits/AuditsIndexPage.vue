@@ -140,6 +140,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
+import { useRoute } from "vue-router";
 import {
   Dialog,
   Notify,
@@ -179,6 +180,7 @@ const eventOptions = [
 ] as const;
 
 const $q = useQuasar();
+const route = useRoute();
 const auth = useAuthStore();
 const rows = ref<AuditEntry[]>([]);
 const isLoading = ref(false);
@@ -441,6 +443,19 @@ function filterUsers(
 }
 
 onMounted(() => {
+  const fromQuery = route.query.from;
+  const toQuery = route.query.to;
+
+  if (typeof fromQuery === "string" && fromQuery !== "") {
+    draft.from = fromQuery;
+    applied.from = fromQuery;
+  }
+
+  if (typeof toQuery === "string" && toQuery !== "") {
+    draft.to = toQuery;
+    applied.to = toQuery;
+  }
+
   void loadAudits();
 });
 </script>

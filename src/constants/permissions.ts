@@ -1,6 +1,7 @@
 export const Permission = {
   DashboardSidebar: "dashboard.sidebar",
   DashboardView: "dashboard.view",
+  DashboardCards: "dashboard.cards",
   UsersSidebar: "users.sidebar",
   UsersView: "users.view",
   UsersShow: "users.show",
