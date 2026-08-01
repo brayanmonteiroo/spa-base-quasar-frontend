@@ -139,7 +139,7 @@ function onCardClick(card: DashboardCard): void {
       icon: "lock",
       message: card.forbiddenMessage,
       timeout: 3500,
-      position: "top"
+      position: "bottom"
     });
 
     return;
