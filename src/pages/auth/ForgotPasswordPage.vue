@@ -9,14 +9,14 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form class="q-gutter-md" @submit.prevent="onSubmit">
+        <q-form class="q-gutter-md" novalidate @submit.prevent="onSubmit">
           <q-input
             v-model="email"
             type="email"
             label="E-mail"
             outlined
             dense
-            :rules="[val => !!val || 'Informe o e-mail']"
+            :rules="[emailRule()]"
           />
 
           <div
@@ -54,6 +54,7 @@ import { ref } from "vue";
 import { Notify, useQuasar } from "quasar";
 import { useAuthStore } from "@/stores/auth";
 import { getApiErrorMessage } from "@/utils/api-error";
+import { emailRule } from "@/utils/validation";
 
 const $q = useQuasar();
 const auth = useAuthStore();

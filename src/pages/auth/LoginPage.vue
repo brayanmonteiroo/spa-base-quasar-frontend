@@ -9,7 +9,7 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form class="q-gutter-md" @submit.prevent="onSubmit">
+        <q-form class="q-gutter-md" novalidate @submit.prevent="onSubmit">
           <q-input
             v-model="email"
             type="email"
@@ -17,7 +17,7 @@
             outlined
             dense
             autocomplete="username"
-            :rules="[val => !!val || 'Informe o e-mail']"
+            :rules="[emailRule()]"
           />
 
           <q-input
@@ -27,7 +27,7 @@
             outlined
             dense
             autocomplete="current-password"
-            :rules="[val => !!val || 'Informe a senha']"
+            :rules="[requiredRule('Informe a senha')]"
           >
             <template #append>
               <q-icon
@@ -76,6 +76,7 @@ import { useRoute, useRouter } from "vue-router";
 import { Notify, useQuasar } from "quasar";
 import { useAuthStore } from "@/stores/auth";
 import { getApiErrorMessage } from "@/utils/api-error";
+import { emailRule, requiredRule } from "@/utils/validation";
 
 const $q = useQuasar();
 const auth = useAuthStore();

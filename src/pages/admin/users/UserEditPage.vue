@@ -6,7 +6,7 @@
 
     <q-card v-if="!isLoading" flat bordered class="full-width form-card">
       <q-card-section>
-        <q-form class="q-gutter-y-md" @submit.prevent="onSubmit">
+        <q-form class="q-gutter-y-md" novalidate @submit.prevent="onSubmit">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-input
@@ -14,7 +14,7 @@
                 label="Nome"
                 outlined
                 dense
-                :rules="[val => !!val || 'Informe o nome']"
+                :rules="[requiredRule('Informe o nome')]"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -24,7 +24,7 @@
                 label="E-mail"
                 outlined
                 dense
-                :rules="[val => !!val || 'Informe o e-mail']"
+                :rules="[emailRule()]"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -137,6 +137,7 @@ import { Notify } from "quasar";
 import { fetchUser, updateUser } from "@/services/users";
 import { fetchRoles } from "@/services/roles";
 import { getApiErrorMessage } from "@/utils/api-error";
+import { emailRule, requiredRule } from "@/utils/validation";
 
 interface RoleOption {
   label: string;

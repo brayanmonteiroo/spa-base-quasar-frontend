@@ -30,7 +30,12 @@
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="q-gutter-sm">
-        <q-btn flat class="table-filters__clear" label="Limpar" @click="emit('clear')" />
+        <q-btn
+          flat
+          class="table-filters__clear"
+          label="Limpar"
+          @click="emit('clear')"
+        />
         <q-btn
           unelevated
           color="primary"
