@@ -9,11 +9,11 @@
             <div class="col-12 col-md-6">
               <q-input
                 v-model="form.name"
-                label="Identificador"
-                hint="Nome técnico interno do perfil (ex.: editor)"
+                label="Nome"
+                hint="Nome do perfil exibido na aplicação (ex.: Editor)"
                 outlined
                 dense
-                :rules="[val => !!val || 'Informe o identificador']"
+                :rules="[val => !!val || 'Informe o nome do perfil']"
               />
             </div>
           </div>

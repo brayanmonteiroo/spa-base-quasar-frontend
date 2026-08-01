@@ -100,7 +100,8 @@
                 color="negative"
                 aria-label="Excluir"
                 :disable="
-                  props.row.name === 'admin' || props.row.users_count > 0
+                  props.row.name === RoleName.Administrador ||
+                  props.row.users_count > 0
                 "
                 @click="confirmDelete(props.row)"
               />
@@ -145,7 +146,10 @@
             icon="delete"
             color="negative"
             aria-label="Excluir"
-            :disable="props.row.name === 'admin' || props.row.users_count > 0"
+            :disable="
+              props.row.name === RoleName.Administrador ||
+              props.row.users_count > 0
+            "
             @click="confirmDelete(props.row)"
           />
         </q-td>
@@ -166,6 +170,7 @@ import {
 import TableFilters from "@/components/table/TableFilters.vue";
 import { useAuthStore } from "@/stores/auth";
 import { Permission } from "@/constants/permissions";
+import { RoleName } from "@/constants/role-names";
 import { deleteRole, fetchRoles, type Role } from "@/services/roles";
 import { sortDirectionFromDescending } from "@/types/table";
 import { getApiErrorMessage } from "@/utils/api-error";

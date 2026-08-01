@@ -41,11 +41,7 @@
           <div class="col-12 col-md-6">
             <div class="text-caption text-grey-7">Perfis</div>
             <div class="text-body1">
-              {{
-                user.roles.length > 0
-                  ? user.roles.map(roleLabel).join(", ")
-                  : "Nenhum"
-              }}
+              {{ user.roles.length > 0 ? user.roles.join(", ") : "Nenhum" }}
             </div>
           </div>
           <div class="col-12 col-md-6">
@@ -70,7 +66,6 @@ import { useRoute, useRouter } from "vue-router";
 import { Notify, useQuasar } from "quasar";
 import { useAuthStore, type AuthUser } from "@/stores/auth";
 import { Permission } from "@/constants/permissions";
-import { roleLabel } from "@/constants/role-labels";
 import { fetchUser } from "@/services/users";
 import { getApiErrorMessage } from "@/utils/api-error";
 

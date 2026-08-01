@@ -179,7 +179,6 @@ import {
 import TableFilters from "@/components/table/TableFilters.vue";
 import { useAuthStore } from "@/stores/auth";
 import { Permission } from "@/constants/permissions";
-import { RoleLabel, roleLabel } from "@/constants/role-labels";
 import { fetchRoles } from "@/services/roles";
 import { deleteUser, fetchUsers, type ListedUser } from "@/services/users";
 import { sortDirectionFromDescending } from "@/types/table";
@@ -194,9 +193,7 @@ const $q = useQuasar();
 const auth = useAuthStore();
 const rows = ref<ListedUser[]>([]);
 const isLoading = ref(false);
-const roleOptions = ref<{ label: string; value: string }[]>(
-  Object.entries(RoleLabel).map(([value, label]) => ({ label, value }))
-);
+const roleOptions = ref<{ label: string; value: string }[]>([]);
 
 const draft = reactive<UserFilters>({
   q: "",
@@ -220,7 +217,7 @@ function formatRoles(roles: string[]): string {
     return "Nenhum";
   }
 
-  return roles.map(roleLabel).join(", ");
+  return roles.join(", ");
 }
 
 const columns = computed((): QTableColumn[] => {
@@ -367,7 +364,7 @@ async function loadRoleOptions(): Promise<void> {
       value: role.name
     }));
   } catch {
-    // Keep static RoleLabel fallback.
+    // Filter stays empty if roles cannot be loaded.
   }
 }
 

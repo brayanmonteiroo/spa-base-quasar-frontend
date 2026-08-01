@@ -11,11 +11,11 @@
             <div class="col-12 col-md-6">
               <q-input
                 v-model="form.name"
-                label="Identificador"
-                :hint="displayHint"
+                label="Nome"
+                hint="Nome do perfil exibido na aplicação"
                 outlined
                 dense
-                :rules="[val => !!val || 'Informe o identificador']"
+                :rules="[val => !!val || 'Informe o nome do perfil']"
               />
             </div>
           </div>
@@ -55,12 +55,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Notify } from "quasar";
 import PermissionCatalogFields from "@/components/roles/PermissionCatalogFields.vue";
 import type { PermissionCatalogSection } from "@/constants/permission-catalog";
-import { roleLabel } from "@/constants/role-labels";
 import {
   fetchPermissionCatalog,
   fetchRole,
@@ -75,7 +74,6 @@ const auth = useAuthStore();
 const isLoading = ref(true);
 const isSubmitting = ref(false);
 const sections = ref<PermissionCatalogSection[]>([]);
-const currentLabel = ref("");
 
 const form = reactive({
   name: "",
@@ -83,13 +81,6 @@ const form = reactive({
 });
 
 const roleId = Number(route.params.id);
-
-const displayHint = computed(() => {
-  const label = roleLabel(form.name) || currentLabel.value;
-  return label && label !== form.name
-    ? `Exibido como: ${label}`
-    : "Slug interno do perfil";
-});
 
 onMounted(async () => {
   try {
@@ -100,7 +91,6 @@ onMounted(async () => {
 
     form.name = role.name;
     form.permissions = [...role.permissions];
-    currentLabel.value = role.label;
     sections.value = permissionGroups;
   } catch (error) {
     Notify.create({

@@ -100,6 +100,7 @@
 import { onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Notify } from "quasar";
+import { RoleName } from "@/constants/role-names";
 import { createUser } from "@/services/users";
 import { fetchRoles } from "@/services/roles";
 import { getApiErrorMessage } from "@/utils/api-error";
@@ -120,7 +121,7 @@ const form = reactive({
   email: "",
   password: "",
   password_confirmation: "",
-  roles: ["user"] as string[]
+  roles: [RoleName.Usuario] as string[]
 });
 
 onMounted(async () => {
