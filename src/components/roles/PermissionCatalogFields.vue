@@ -1,19 +1,18 @@
 <template>
-  <div class="q-gutter-sm">
+  <div class="q-gutter-y-sm">
     <q-expansion-item
       v-for="group in catalog"
       :key="group.key"
-      dense
       bordered
-      class="permission-group overflow-hidden"
-      header-class="bg-grey-2 text-weight-medium"
+      class="permission-group"
+      header-class="text-weight-medium permission-group__header"
       :label="group.label"
       :caption="groupCaption(group)"
       :default-opened="false"
     >
-      <q-card flat>
-        <q-card-section class="q-pt-none">
-          <div class="row items-center q-mb-sm q-gutter-sm">
+      <q-card flat class="permission-group__body">
+        <q-card-section>
+          <div class="row items-center justify-end q-gutter-sm q-mb-md">
             <q-btn
               flat
               dense
@@ -26,23 +25,28 @@
               flat
               dense
               size="sm"
-              color="grey-8"
+              color="grey-7"
               label="Limpar"
               @click="clearGroup(group)"
             />
           </div>
 
-          <div class="column q-gutter-xs">
-            <q-checkbox
+          <div class="row q-col-gutter-x-md q-col-gutter-y-sm">
+            <div
               v-for="permission in group.permissions"
               :key="permission.name"
-              dense
-              :model-value="modelValue.includes(permission.name)"
-              :label="permission.label"
-              @update:model-value="
-                checked => togglePermission(permission.name, checked === true)
-              "
-            />
+              class="col-6 col-sm-4 col-md-3 col-lg-2"
+            >
+              <q-checkbox
+                dense
+                :model-value="modelValue.includes(permission.name)"
+                :label="permission.label"
+                @update:model-value="
+                  checked =>
+                    togglePermission(permission.name, checked === true)
+                "
+              />
+            </div>
           </div>
         </q-card-section>
       </q-card>
@@ -92,5 +96,23 @@ function clearGroup(group: PermissionCatalogGroup): void {
 <style scoped lang="scss">
 .permission-group {
   border-radius: 4px;
+  overflow: hidden;
+
+  :deep(.permission-group__header) {
+    min-height: 56px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: #eeeeee;
+  }
+
+  :deep(.q-item__label--caption) {
+    margin-top: 2px;
+    line-height: 1.25;
+    overflow: visible;
+  }
+
+  :deep(.permission-group__body) {
+    background: #fafafa;
+  }
 }
 </style>

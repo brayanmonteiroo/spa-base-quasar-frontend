@@ -38,7 +38,7 @@
           <q-card flat bordered>
             <q-card-section>
               <div class="text-subtitle1 text-weight-medium">
-                {{ props.row.name }}
+                {{ props.row.label }}
               </div>
               <div class="text-caption text-grey-7">
                 {{ props.row.permissions.length }} permissões ·
@@ -160,7 +160,7 @@ const columns = computed((): QTableColumn[] => {
     {
       name: "name",
       label: "Nome",
-      field: "name",
+      field: "label",
       align: "left",
       sortable: true
     },
@@ -229,7 +229,7 @@ const onRequest: QTableProps["onRequest"] = ({ pagination: next }) => {
 function confirmDelete(role: Role): void {
   Dialog.create({
     title: "Excluir perfil",
-    message: `Remover o perfil ${role.name}? Esta ação não pode ser desfeita.`,
+    message: `Remover o perfil ${role.label}? Esta ação não pode ser desfeita.`,
     cancel: true,
     persistent: true
   }).onOk(() => {

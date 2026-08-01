@@ -5,5 +5,49 @@
 }
 
 .form-card {
-  max-width: 560px;
+  width: 100%;
+}
+
+// Respiro entre o drawer/conteúdo e os cards das páginas admin
+.q-page-container > .q-page {
+  padding: 24px 32px;
+}
+
+// Garante fundo escuro em todo o layout (page/container)
+body.body--dark,
+body.body--dark #q-app,
+body.body--dark .q-layout,
+body.body--dark .q-page-container,
+body.body--dark .q-page {
+  background: $dark-page;
+}
+
+// Hierarquia de contraste no dark mode (página → card → grupos)
+body.body--dark {
+  .form-card {
+    background: #1e1e1e;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+  }
+
+  .form-card .q-field--outlined .q-field__control:before {
+    border-color: rgba(255, 255, 255, 0.32);
+  }
+
+  .form-card .q-field--outlined:hover .q-field__control:before {
+    border-color: rgba(255, 255, 255, 0.48);
+  }
+
+  .permission-group {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    background: #171717;
+  }
+
+  .permission-group .permission-group__header {
+    background: #2c2c2c !important;
+  }
+
+  .permission-group .permission-group__body {
+    background: #141414;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
 }

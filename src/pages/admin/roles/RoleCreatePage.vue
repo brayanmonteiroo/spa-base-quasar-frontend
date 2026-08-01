@@ -4,14 +4,19 @@
 
     <q-card flat bordered class="full-width form-card">
       <q-card-section>
-        <q-form class="q-gutter-md" @submit.prevent="onSubmit">
-          <q-input
-            v-model="form.name"
-            label="Nome"
-            outlined
-            dense
-            :rules="[val => !!val || 'Informe o nome']"
-          />
+        <q-form class="q-gutter-y-md" @submit.prevent="onSubmit">
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.name"
+                label="Identificador"
+                hint="Nome técnico interno do perfil (ex.: editor)"
+                outlined
+                dense
+                :rules="[val => !!val || 'Informe o identificador']"
+              />
+            </div>
+          </div>
 
           <div>
             <div class="text-subtitle2 q-mb-sm">Permissões</div>

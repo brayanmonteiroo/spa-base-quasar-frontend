@@ -52,6 +52,12 @@ const routes: RouteRecordRaw[] = [
         meta: { permission: Permission.UsersCreate }
       },
       {
+        path: "users/:id",
+        name: "admin-users-show",
+        component: () => import("@/pages/admin/users/UserShowPage.vue"),
+        meta: { permission: Permission.UsersShow }
+      },
+      {
         path: "users/:id/edit",
         name: "admin-users-edit",
         component: () => import("@/pages/admin/users/UserEditPage.vue"),

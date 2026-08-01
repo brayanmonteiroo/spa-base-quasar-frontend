@@ -24,31 +24,37 @@
 
     <q-card v-if="!isLoading && role" flat bordered class="full-width form-card">
       <q-card-section>
-        <div class="text-subtitle1 text-weight-medium">{{ role.name }}</div>
+        <div class="text-subtitle1 text-weight-medium">{{ role.label }}</div>
         <div class="text-caption text-grey-7 q-mb-md">
           {{ role.users_count }} usuário(s) vinculado(s)
         </div>
 
         <div class="text-subtitle2 q-mb-sm">Permissões</div>
-        <div class="q-gutter-sm">
+        <div class="q-gutter-y-sm">
           <q-expansion-item
             v-for="group in catalogWithSelection"
             :key="group.key"
-            dense
             bordered
-            class="overflow-hidden"
-            header-class="bg-grey-2 text-weight-medium"
+            class="permission-group"
+            header-class="text-weight-medium permission-group__header"
             :label="group.label"
-            :caption="`${group.selected.length}/${group.permissions.length}`"
+            :caption="`${group.selected.length}/${group.permissions.length} selecionadas`"
             :default-opened="false"
           >
-            <q-card flat>
-              <q-card-section class="q-pt-none">
-                <q-list dense v-if="group.selected.length > 0">
-                  <q-item v-for="item in group.selected" :key="item.name">
-                    <q-item-section>{{ item.label }}</q-item-section>
-                  </q-item>
-                </q-list>
+            <q-card flat class="permission-group__body">
+              <q-card-section>
+                <div
+                  v-if="group.selected.length > 0"
+                  class="row q-col-gutter-x-md q-col-gutter-y-sm"
+                >
+                  <div
+                    v-for="item in group.selected"
+                    :key="item.name"
+                    class="col-6 col-sm-4 col-md-3 col-lg-2"
+                  >
+                    <div class="text-body2">{{ item.label }}</div>
+                  </div>
+                </div>
                 <div v-else class="text-caption text-grey-7">
                   Nenhuma permissão neste módulo.
                 </div>
@@ -57,11 +63,11 @@
           </q-expansion-item>
         </div>
       </q-card-section>
-
-      <q-card-actions>
-        <q-btn flat label="Voltar" :to="{ name: 'admin-roles' }" />
-      </q-card-actions>
     </q-card>
+
+    <div v-if="!isLoading && role" class="q-mt-md">
+      <q-btn flat label="Voltar" :to="{ name: 'admin-roles' }" />
+    </div>
   </q-page>
 </template>
 
@@ -110,3 +116,27 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped lang="scss">
+.permission-group {
+  border-radius: 4px;
+  overflow: hidden;
+
+  :deep(.permission-group__header) {
+    min-height: 56px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: #eeeeee;
+  }
+
+  :deep(.q-item__label--caption) {
+    margin-top: 2px;
+    line-height: 1.25;
+    overflow: visible;
+  }
+
+  :deep(.permission-group__body) {
+    background: #fafafa;
+  }
+}
+</style>

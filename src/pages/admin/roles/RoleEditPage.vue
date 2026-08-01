@@ -6,14 +6,19 @@
 
     <q-card v-if="!isLoading" flat bordered class="full-width form-card">
       <q-card-section>
-        <q-form class="q-gutter-md" @submit.prevent="onSubmit">
-          <q-input
-            v-model="form.name"
-            label="Nome"
-            outlined
-            dense
-            :rules="[val => !!val || 'Informe o nome']"
-          />
+        <q-form class="q-gutter-y-md" @submit.prevent="onSubmit">
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.name"
+                label="Identificador"
+                :hint="displayHint"
+                outlined
+                dense
+                :rules="[val => !!val || 'Informe o identificador']"
+              />
+            </div>
+          </div>
 
           <div>
             <div class="text-subtitle2 q-mb-sm">Permissões</div>
@@ -50,11 +55,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Notify } from "quasar";
 import PermissionCatalogFields from "@/components/roles/PermissionCatalogFields.vue";
 import type { PermissionCatalogGroup } from "@/constants/permission-catalog";
+import { roleLabel } from "@/constants/role-labels";
 import {
   fetchPermissionCatalog,
   fetchRole,
@@ -67,6 +73,7 @@ const router = useRouter();
 const isLoading = ref(true);
 const isSubmitting = ref(false);
 const catalog = ref<PermissionCatalogGroup[]>([]);
+const currentLabel = ref("");
 
 const form = reactive({
   name: "",
@@ -74,6 +81,13 @@ const form = reactive({
 });
 
 const roleId = Number(route.params.id);
+
+const displayHint = computed(() => {
+  const label = roleLabel(form.name) || currentLabel.value;
+  return label && label !== form.name
+    ? `Exibido como: ${label}`
+    : "Slug interno do perfil";
+});
 
 onMounted(async () => {
   try {
@@ -84,6 +98,7 @@ onMounted(async () => {
 
     form.name = role.name;
     form.permissions = [...role.permissions];
+    currentLabel.value = role.label;
     catalog.value = permissionGroups;
   } catch (error) {
     Notify.create({

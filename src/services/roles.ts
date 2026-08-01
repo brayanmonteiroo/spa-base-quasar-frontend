@@ -4,6 +4,7 @@ import type { PermissionCatalogGroup } from "@/constants/permission-catalog";
 export interface Role {
   id: number;
   name: string;
+  label: string;
   guard_name: string;
   permissions: string[];
   users_count: number;

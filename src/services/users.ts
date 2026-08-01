@@ -22,6 +22,7 @@ export interface UserPayload {
   email: string;
   password?: string;
   password_confirmation?: string;
+  roles: string[];
 }
 
 export async function fetchUsers(
