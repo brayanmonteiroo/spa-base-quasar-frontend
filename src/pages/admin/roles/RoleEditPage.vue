@@ -24,7 +24,7 @@
             <div class="text-subtitle2 q-mb-sm">Permissões</div>
             <PermissionCatalogFields
               v-model="form.permissions"
-              :catalog="catalog"
+              :sections="sections"
             />
           </div>
 
@@ -59,7 +59,7 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Notify } from "quasar";
 import PermissionCatalogFields from "@/components/roles/PermissionCatalogFields.vue";
-import type { PermissionCatalogGroup } from "@/constants/permission-catalog";
+import type { PermissionCatalogSection } from "@/constants/permission-catalog";
 import { roleLabel } from "@/constants/role-labels";
 import {
   fetchPermissionCatalog,
@@ -72,7 +72,7 @@ const route = useRoute();
 const router = useRouter();
 const isLoading = ref(true);
 const isSubmitting = ref(false);
-const catalog = ref<PermissionCatalogGroup[]>([]);
+const sections = ref<PermissionCatalogSection[]>([]);
 const currentLabel = ref("");
 
 const form = reactive({
@@ -99,7 +99,7 @@ onMounted(async () => {
     form.name = role.name;
     form.permissions = [...role.permissions];
     currentLabel.value = role.label;
-    catalog.value = permissionGroups;
+    sections.value = permissionGroups;
   } catch (error) {
     Notify.create({
       type: "negative",

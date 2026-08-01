@@ -36,6 +36,10 @@ export default defineBoot(({ router }) => {
       return { name: "admin-roles" };
     }
 
+    if (auth.can(Permission.AuditView)) {
+      return { name: "admin-audits" };
+    }
+
     return { name: "login" };
   }
 

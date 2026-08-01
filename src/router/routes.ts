@@ -86,6 +86,12 @@ const routes: RouteRecordRaw[] = [
         name: "admin-roles-edit",
         component: () => import("@/pages/admin/roles/RoleEditPage.vue"),
         meta: { permission: Permission.RolesUpdate }
+      },
+      {
+        path: "audits",
+        name: "admin-audits",
+        component: () => import("@/pages/admin/audits/AuditsIndexPage.vue"),
+        meta: { permission: Permission.AuditView }
       }
     ]
   },

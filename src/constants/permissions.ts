@@ -12,7 +12,9 @@ export const Permission = {
   RolesShow: "roles.show",
   RolesCreate: "roles.create",
   RolesUpdate: "roles.update",
-  RolesDelete: "roles.delete"
+  RolesDelete: "roles.delete",
+  AuditSidebar: "audit.sidebar",
+  AuditView: "audit.view"
 } as const;
 
 export type Permission = (typeof Permission)[keyof typeof Permission];

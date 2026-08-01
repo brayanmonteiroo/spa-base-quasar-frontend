@@ -60,22 +60,24 @@
       :width="260"
     >
       <q-list padding>
-        <q-item-label header>Menu</q-item-label>
+        <template v-for="section in visibleSections" :key="section.label">
+          <q-item-label header>{{ section.label }}</q-item-label>
 
-        <q-item
-          v-for="link in links"
-          :key="link.label"
-          clickable
-          v-ripple
-          :to="link.to"
-          exact
-          active-class="bg-primary text-white"
-        >
-          <q-item-section avatar>
-            <q-icon :name="link.icon" />
-          </q-item-section>
-          <q-item-section>{{ link.label }}</q-item-section>
-        </q-item>
+          <q-item
+            v-for="link in section.items"
+            :key="link.label"
+            clickable
+            v-ripple
+            :to="link.to"
+            exact
+            active-class="bg-primary text-white"
+          >
+            <q-item-section avatar>
+              <q-icon :name="link.icon" />
+            </q-item-section>
+            <q-item-section>{{ link.label }}</q-item-section>
+          </q-item>
+        </template>
       </q-list>
     </q-drawer>
 
@@ -94,6 +96,18 @@ import { useDarkMode } from "@/composables/useDarkMode";
 import { Permission } from "@/constants/permissions";
 import { getApiErrorMessage } from "@/utils/api-error";
 
+interface NavLink {
+  label: string;
+  icon: string;
+  to: { name: string };
+  permission: Permission;
+}
+
+interface NavSection {
+  label: string;
+  items: NavLink[];
+}
+
 const auth = useAuthStore();
 const { isDark, icon: darkIcon, toggle: toggleDark } = useDarkMode();
 const router = useRouter();
@@ -101,29 +115,50 @@ const route = useRoute();
 const $q = useQuasar();
 const leftDrawerOpen = ref(false);
 
-const allLinks = [
+const navSections: NavSection[] = [
   {
-    label: "Painel",
-    icon: "dashboard",
-    to: { name: "admin-dashboard" },
-    permission: Permission.DashboardSidebar
+    label: "Menu",
+    items: [
+      {
+        label: "Painel",
+        icon: "dashboard",
+        to: { name: "admin-dashboard" },
+        permission: Permission.DashboardSidebar
+      }
+    ]
   },
   {
-    label: "Usuários",
-    icon: "people",
-    to: { name: "admin-users" },
-    permission: Permission.UsersSidebar
-  },
-  {
-    label: "Perfis",
-    icon: "badge",
-    to: { name: "admin-roles" },
-    permission: Permission.RolesSidebar
+    label: "Configurações",
+    items: [
+      {
+        label: "Usuários",
+        icon: "people",
+        to: { name: "admin-users" },
+        permission: Permission.UsersSidebar
+      },
+      {
+        label: "Perfis",
+        icon: "badge",
+        to: { name: "admin-roles" },
+        permission: Permission.RolesSidebar
+      },
+      {
+        label: "Auditoria",
+        icon: "history",
+        to: { name: "admin-audits" },
+        permission: Permission.AuditSidebar
+      }
+    ]
   }
-] as const;
+];
 
-const links = computed(() =>
-  allLinks.filter(link => auth.can(link.permission))
+const visibleSections = computed(() =>
+  navSections
+    .map(section => ({
+      ...section,
+      items: section.items.filter(item => auth.can(item.permission))
+    }))
+    .filter(section => section.items.length > 0)
 );
 
 watch(

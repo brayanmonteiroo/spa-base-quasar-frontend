@@ -24,7 +24,7 @@
             <PermissionCatalogFields
               v-if="!isCatalogLoading"
               v-model="form.permissions"
-              :catalog="catalog"
+              :sections="sections"
             />
           </div>
 
@@ -59,14 +59,14 @@ import { onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Notify } from "quasar";
 import PermissionCatalogFields from "@/components/roles/PermissionCatalogFields.vue";
-import type { PermissionCatalogGroup } from "@/constants/permission-catalog";
+import type { PermissionCatalogSection } from "@/constants/permission-catalog";
 import { createRole, fetchPermissionCatalog } from "@/services/roles";
 import { getApiErrorMessage } from "@/utils/api-error";
 
 const router = useRouter();
 const isSubmitting = ref(false);
 const isCatalogLoading = ref(true);
-const catalog = ref<PermissionCatalogGroup[]>([]);
+const sections = ref<PermissionCatalogSection[]>([]);
 
 const form = reactive({
   name: "",
@@ -75,7 +75,7 @@ const form = reactive({
 
 onMounted(async () => {
   try {
-    catalog.value = await fetchPermissionCatalog();
+    sections.value = await fetchPermissionCatalog();
   } catch (error) {
     Notify.create({
       type: "negative",

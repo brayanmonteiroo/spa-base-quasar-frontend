@@ -1,5 +1,5 @@
 import { api } from "@/boot/axios";
-import type { PermissionCatalogGroup } from "@/constants/permission-catalog";
+import type { PermissionCatalogSection } from "@/constants/permission-catalog";
 
 export interface Role {
   id: number;
@@ -69,9 +69,9 @@ export async function deleteRole(id: number): Promise<void> {
 }
 
 export async function fetchPermissionCatalog(): Promise<
-  PermissionCatalogGroup[]
+  PermissionCatalogSection[]
 > {
-  const { data } = await api.get<{ data: PermissionCatalogGroup[] }>(
+  const { data } = await api.get<{ data: PermissionCatalogSection[] }>(
     "/api/admin/permissions/catalog"
   );
   return data.data;
