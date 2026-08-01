@@ -19,6 +19,14 @@
   overflow: hidden;
 }
 
+// Tokens de ação do conteúdo (botões / ícones) — light
+:root {
+  --admin-action: #{$primary};
+  --admin-danger: #{$negative};
+  --admin-nav-icon: rgba(0, 0, 0, 0.54);
+  --admin-nav-icon-disabled: rgba(0, 0, 0, 0.26);
+}
+
 // Fundo dark na mesma família navy do chrome (não preto puro)
 body.body--dark,
 body.body--dark #q-app,
@@ -36,6 +44,11 @@ body.body--dark {
   --q-negative: #{$dark-negative};
   --q-dark: #{$dark};
   --q-dark-page: #{$dark-page};
+
+  --admin-action: #{$dark-primary};
+  --admin-danger: #{$dark-negative};
+  --admin-nav-icon: #{$dark-text};
+  --admin-nav-icon-disabled: #{$dark-text-muted};
 
   .form-card,
   .q-card,
@@ -78,38 +91,6 @@ body.body--dark {
   .q-table__bottom {
     border-top: 1px solid $dark-border;
     color: $dark-text-muted;
-
-    // Setas: Quasar não define cor → herdam cinza fraco no dark
-    .q-table__control .q-btn {
-      color: $dark-text !important;
-      opacity: 1 !important;
-
-      .q-icon,
-      .q-btn__content {
-        color: $dark-text !important;
-        opacity: 1 !important;
-      }
-
-      &:hover:not(.disabled) {
-        color: #ffffff !important;
-
-        .q-icon,
-        .q-btn__content {
-          color: #ffffff !important;
-        }
-      }
-
-      &.disabled,
-      &[disabled] {
-        color: $dark-text-muted !important;
-        opacity: 0.32 !important;
-
-        .q-icon,
-        .q-btn__content {
-          color: $dark-text-muted !important;
-        }
-      }
-    }
   }
 
   // Filtros: hover navy da paleta (não cinza Material)
@@ -137,7 +118,6 @@ body.body--dark {
     }
   }
 
-  // Tabelas: overflow já no rule global; só reforça no dark
   .q-table__card {
     border-radius: 12px;
   }
@@ -159,15 +139,60 @@ body.body--dark {
     background: $dark-page;
     border-top: 1px solid $dark-border;
   }
+}
 
-  // Ícones de ação flat: mesma saturação do primary dark
-  .q-btn--flat.q-btn--round.text-primary .q-icon,
-  .q-btn--flat.text-primary .q-icon {
-    color: $dark-primary;
+// --- Ações do conteúdo: mesma família do chrome em light e dark ---
+
+// CTA sólido (Novo usuário, Aplicar, etc.)
+.q-btn.bg-primary {
+  background: var(--admin-action) !important;
+}
+
+// Ícones flat de ver / editar
+.q-btn--flat.text-primary,
+.q-btn--flat.text-primary .q-icon,
+.q-btn--flat.text-primary .q-btn__content {
+  color: var(--admin-action) !important;
+}
+
+// Ícones flat de excluir
+.q-btn--flat.text-negative,
+.q-btn--flat.text-negative .q-icon,
+.q-btn--flat.text-negative .q-btn__content {
+  color: var(--admin-danger) !important;
+}
+
+// Paginação da tabela: setas na cor de ação (não cinza “disabled”)
+.q-table__bottom .q-btn {
+  color: var(--admin-action) !important;
+
+  .q-icon,
+  .q-btn__content,
+  .q-btn__content > * {
+    color: var(--admin-action) !important;
   }
 
-  .q-btn--flat.q-btn--round.text-negative .q-icon,
-  .q-btn--flat.text-negative .q-icon {
-    color: $dark-negative;
+  &:hover:not(.disabled):not([disabled]) {
+    color: var(--admin-action) !important;
+    filter: brightness(1.15);
+
+    .q-icon,
+    .q-btn__content,
+    .q-btn__content > * {
+      color: var(--admin-action) !important;
+    }
+  }
+
+  &.disabled,
+  &[disabled] {
+    color: var(--admin-nav-icon-disabled) !important;
+    opacity: 0.45 !important;
+    filter: none;
+
+    .q-icon,
+    .q-btn__content,
+    .q-btn__content > * {
+      color: var(--admin-nav-icon-disabled) !important;
+    }
   }
 }

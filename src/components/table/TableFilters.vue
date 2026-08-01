@@ -30,7 +30,7 @@
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="q-gutter-sm">
-        <q-btn flat color="grey-7" label="Limpar" @click="emit('clear')" />
+        <q-btn flat class="table-filters__clear" label="Limpar" @click="emit('clear')" />
         <q-btn
           unelevated
           color="primary"
@@ -92,5 +92,13 @@ const isExpanded = ref(false);
 
 .table-filters__body {
   border-radius: 0 0 12px 12px;
+}
+
+.table-filters__clear {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+body.body--dark .table-filters__clear {
+  color: #a9b1bc;
 }
 </style>
