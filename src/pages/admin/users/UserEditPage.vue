@@ -136,6 +136,7 @@ import { useRoute, useRouter } from "vue-router";
 import { Notify } from "quasar";
 import { fetchUser, updateUser } from "@/services/users";
 import { fetchRoles } from "@/services/roles";
+import { useAuthStore } from "@/stores/auth";
 import { getApiErrorMessage } from "@/utils/api-error";
 import { emailRule, requiredRule } from "@/utils/validation";
 
@@ -146,6 +147,7 @@ interface RoleOption {
 
 const route = useRoute();
 const router = useRouter();
+const auth = useAuthStore();
 const isLoading = ref(true);
 const isSubmitting = ref(false);
 const isRolesLoading = ref(false);
@@ -218,6 +220,7 @@ async function onSubmit(): Promise<void> {
     };
 
     await updateUser(userId, payload);
+    await auth.fetchUser();
     Notify.create({ type: "positive", message: "Usuário atualizado." });
     await router.push({ name: "admin-users" });
   } catch (error) {

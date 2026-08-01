@@ -149,6 +149,8 @@ function onCardClick(card: DashboardCard): void {
 }
 
 async function loadStats(): Promise<void> {
+  await auth.fetchUser();
+
   if (!auth.can(Permission.DashboardCards)) {
     return;
   }

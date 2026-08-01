@@ -71,12 +71,16 @@ export default defineBoot(({ router }) => {
   }
 
   router.beforeEach(async (to, from) => {
-    if (!auth.isBootstrapped) {
-      await auth.fetchUser();
-    }
-
     const isGuestRoute = to.matched.some(record => record.meta.guest === true);
     const isAdminRoute = to.path.startsWith("/admin");
+
+    // Semelhante ao Inertia: atualiza a autenticação (papéis/permissões) na inicialização e
+    // a cada navegação administrativa, para que a interface seja atualizada sem necessidade de F5.
+    if (!auth.isBootstrapped) {
+      await auth.fetchUser();
+    } else if (auth.isAuthenticated && isAdminRoute) {
+      await auth.fetchUser();
+    }
 
     if (isGuestRoute && auth.isAuthenticated) {
       return firstAllowedAdminRoute();

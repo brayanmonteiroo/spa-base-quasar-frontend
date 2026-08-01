@@ -66,10 +66,12 @@ import {
   fetchRole,
   updateRole
 } from "@/services/roles";
+import { useAuthStore } from "@/stores/auth";
 import { getApiErrorMessage } from "@/utils/api-error";
 
 const route = useRoute();
 const router = useRouter();
+const auth = useAuthStore();
 const isLoading = ref(true);
 const isSubmitting = ref(false);
 const sections = ref<PermissionCatalogSection[]>([]);
@@ -119,6 +121,7 @@ async function onSubmit(): Promise<void> {
       name: form.name,
       permissions: form.permissions
     });
+    await auth.fetchUser();
     Notify.create({ type: "positive", message: "Perfil atualizado." });
     await router.push({ name: "admin-roles" });
   } catch (error) {
