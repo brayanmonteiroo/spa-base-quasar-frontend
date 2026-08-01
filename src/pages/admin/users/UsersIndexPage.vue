@@ -267,7 +267,7 @@ const columns = computed((): QTableColumn[] => {
 });
 
 const pagination = ref({
-  sortBy: "name",
+  sortBy: "id",
   descending: false,
   page: 1,
   rowsPerPage: 10,

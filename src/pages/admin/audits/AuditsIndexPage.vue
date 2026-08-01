@@ -280,6 +280,14 @@ async function showDetails(row: AuditEntry): Promise<void> {
 const columns = computed((): QTableColumn[] => {
   const cols: QTableColumn[] = [
     {
+      name: "id",
+      label: "ID",
+      field: "id",
+      align: "left",
+      sortable: true,
+      style: "width: 80px"
+    },
+    {
       name: "created_at",
       label: "Data",
       field: (row: AuditEntry) => formatDate(row.created_at),
@@ -331,7 +339,7 @@ const columns = computed((): QTableColumn[] => {
 });
 
 const pagination = ref({
-  sortBy: "created_at",
+  sortBy: "id",
   descending: true,
   page: 1,
   rowsPerPage: 10,

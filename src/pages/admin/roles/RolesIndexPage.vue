@@ -197,6 +197,14 @@ const activeFilterCount = computed(() => (applied.q.trim() !== "" ? 1 : 0));
 const columns = computed((): QTableColumn[] => {
   const cols: QTableColumn[] = [
     {
+      name: "id",
+      label: "ID",
+      field: "id",
+      align: "left",
+      sortable: true,
+      style: "width: 80px"
+    },
+    {
       name: "name",
       label: "Nome",
       field: "label",
@@ -228,7 +236,7 @@ const columns = computed((): QTableColumn[] => {
 });
 
 const pagination = ref({
-  sortBy: "name",
+  sortBy: "id",
   descending: false,
   page: 1,
   rowsPerPage: 10,
