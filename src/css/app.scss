@@ -1,9 +1,5 @@
 // app global css
 
-.auth-card {
-  max-width: 420px;
-}
-
 .form-card {
   width: 100%;
 }
@@ -33,12 +29,17 @@
   --admin-nav-icon-disabled: rgba(0, 0, 0, 0.26);
 }
 
-// Fundo dark na mesma família navy do chrome (não preto puro)
+// Fundo dark na mesma família navy do chrome (não preto puro).
+// Guest auth usa gradiente próprio — não pintar layout/página sólidos.
 body.body--dark,
-body.body--dark #q-app,
-body.body--dark .q-layout,
-body.body--dark .q-page-container,
-body.body--dark .q-page {
+body.body--dark #q-app {
+  background: $dark-page;
+  color: $dark-text;
+}
+
+body.body--dark .q-layout:not(.guest-shell),
+body.body--dark .q-layout:not(.guest-shell) .q-page-container,
+body.body--dark .q-layout:not(.guest-shell) .q-page {
   background: $dark-page;
   color: $dark-text;
 }

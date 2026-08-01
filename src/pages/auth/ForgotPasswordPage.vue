@@ -1,62 +1,50 @@
 <template>
-  <q-page class="flex flex-center q-pa-md">
-    <q-card class="auth-card full-width q-pa-sm">
-      <q-card-section>
-        <div class="text-h5 text-weight-medium">Recuperar senha</div>
-        <div class="text-caption text-grey-7 q-mt-xs">
-          Enviaremos um link de redefinição para o seu e-mail
-        </div>
-      </q-card-section>
+  <AuthCard
+    title="Recuperar senha"
+    subtitle="Enviaremos um link de redefinição para o seu e-mail"
+  >
+    <q-form class="q-gutter-md" novalidate @submit.prevent="onSubmit">
+      <q-input
+        v-model="email"
+        type="email"
+        label="E-mail"
+        outlined
+        dense
+        :rules="[emailRule()]"
+      />
 
-      <q-card-section>
-        <q-form class="q-gutter-md" novalidate @submit.prevent="onSubmit">
-          <q-input
-            v-model="email"
-            type="email"
-            label="E-mail"
-            outlined
-            dense
-            :rules="[emailRule()]"
+      <div class="column q-gutter-y-md">
+        <q-btn
+          class="full-width auth-submit"
+          type="submit"
+          label="Enviar link"
+          icon="send"
+          no-caps
+          unelevated
+          :loading="isSubmitting"
+        />
+
+        <div class="row justify-center">
+          <AuthLink
+            :to="{ name: 'login' }"
+            label="Voltar ao login"
+            icon="arrow_back"
           />
-
-          <div
-            class="row items-center q-col-gutter-sm"
-            :class="$q.screen.lt.sm ? 'column reverse' : 'justify-between'"
-          >
-            <div class="col-auto">
-              <router-link
-                class="text-primary text-caption"
-                :to="{ name: 'login' }"
-              >
-                Voltar ao login
-              </router-link>
-            </div>
-
-            <div class="col-12 col-sm-auto">
-              <q-btn
-                class="full-width"
-                type="submit"
-                color="primary"
-                label="Enviar link"
-                :loading="isSubmitting"
-                unelevated
-              />
-            </div>
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-card>
-  </q-page>
+        </div>
+      </div>
+    </q-form>
+  </AuthCard>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Notify, useQuasar } from "quasar";
+import { Notify } from "quasar";
+import AuthCard from "@/components/auth/AuthCard.vue";
+import AuthLink from "@/components/auth/AuthLink.vue";
 import { useAuthStore } from "@/stores/auth";
 import { getApiErrorMessage } from "@/utils/api-error";
 import { emailRule } from "@/utils/validation";
 
-const $q = useQuasar();
 const auth = useAuthStore();
 const email = ref("");
 const isSubmitting = ref(false);
