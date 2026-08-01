@@ -86,6 +86,9 @@
     </q-drawer>
 
     <q-page-container>
+      <div class="admin-shell__page-top">
+        <AppBreadcrumbs />
+      </div>
       <router-view />
     </q-page-container>
   </q-layout>
@@ -99,6 +102,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useDarkMode } from "@/composables/useDarkMode";
 import { Permission } from "@/constants/permissions";
 import { getApiErrorMessage } from "@/utils/api-error";
+import AppBreadcrumbs from "@/components/navigation/AppBreadcrumbs.vue";
 
 interface NavLink {
   label: string;
@@ -274,6 +278,17 @@ body.body--dark .admin-shell .q-header .q-layout__shadow {
     width: 3px;
     border-radius: 0 3px 3px 0;
     background: var(--admin-nav-active-accent);
+  }
+}
+
+// Breadcrumbs: logo abaixo do header, alinhado ao padding da página
+.admin-shell__page-top {
+  padding: 16px 32px 0;
+}
+
+@media (max-width: 599px) {
+  .admin-shell__page-top {
+    padding: 12px 16px 0;
   }
 }
 </style>

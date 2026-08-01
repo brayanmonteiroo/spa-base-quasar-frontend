@@ -10,7 +10,13 @@
 
 // Respiro entre o drawer/conteúdo e os cards das páginas admin
 .q-page-container > .q-page {
-  padding: 24px 32px;
+  padding: 12px 32px 24px;
+}
+
+@media (max-width: 599px) {
+  .q-page-container > .q-page {
+    padding: 8px 16px 20px;
+  }
 }
 
 // Raio alinhado entre filtros e tabelas
