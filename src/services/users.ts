@@ -2,8 +2,19 @@ import { api } from "@/boot/axios";
 import type { AuthUser } from "@/stores/auth";
 import type { TableListParams } from "@/types/table";
 
+/** Admin index payload — no permissions (avoids heavy Spatie resolution). */
+export interface ListedUser {
+  id: number;
+  name: string;
+  email: string;
+  email_verified_at: string | null;
+  created_at: string;
+  updated_at: string;
+  roles: string[];
+}
+
 export interface PaginatedUsers {
-  data: AuthUser[];
+  data: ListedUser[];
   meta: {
     current_page: number;
     last_page: number;

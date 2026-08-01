@@ -177,11 +177,11 @@ import {
   type QTableProps
 } from "quasar";
 import TableFilters from "@/components/table/TableFilters.vue";
-import { useAuthStore, type AuthUser } from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth";
 import { Permission } from "@/constants/permissions";
 import { RoleLabel, roleLabel } from "@/constants/role-labels";
 import { fetchRoles } from "@/services/roles";
-import { deleteUser, fetchUsers } from "@/services/users";
+import { deleteUser, fetchUsers, type ListedUser } from "@/services/users";
 import { sortDirectionFromDescending } from "@/types/table";
 import { getApiErrorMessage } from "@/utils/api-error";
 
@@ -192,7 +192,7 @@ interface UserFilters {
 
 const $q = useQuasar();
 const auth = useAuthStore();
-const rows = ref<AuthUser[]>([]);
+const rows = ref<ListedUser[]>([]);
 const isLoading = ref(false);
 const roleOptions = ref<{ label: string; value: string }[]>(
   Object.entries(RoleLabel).map(([value, label]) => ({ label, value }))
@@ -250,7 +250,7 @@ const columns = computed((): QTableColumn[] => {
     {
       name: "roles",
       label: "Perfis",
-      field: (row: AuthUser) => formatRoles(row.roles),
+      field: (row: ListedUser) => formatRoles(row.roles),
       align: "left"
     },
     {
@@ -330,7 +330,7 @@ function clearFilters(): void {
   void loadUsers();
 }
 
-function confirmDelete(user: AuthUser): void {
+function confirmDelete(user: ListedUser): void {
   Dialog.create({
     title: "Excluir usuário",
     message: `Remover ${user.name}? Esta ação não pode ser desfeita.`,

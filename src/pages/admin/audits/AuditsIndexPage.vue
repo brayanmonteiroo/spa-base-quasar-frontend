@@ -31,8 +31,20 @@
           emit-value
           map-options
           options-dense
+          use-input
+          input-debounce="300"
+          placeholder="Digite para buscar"
           :loading="isLoadingUsers"
-        />
+          @filter="filterUsers"
+        >
+          <template #no-option>
+            <q-item>
+              <q-item-section class="text-grey">
+                Digite para buscar usuários
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
       </div>
       <div class="col-12 col-sm-6 col-md-3">
         <q-input
@@ -100,6 +112,7 @@
                 icon="info"
                 color="primary"
                 aria-label="Detalhes"
+                :loading="detailLoadingId === props.row.id"
                 @click="showDetails(props.row)"
               />
             </q-card-actions>
@@ -116,6 +129,7 @@
             icon="info"
             color="primary"
             aria-label="Detalhes"
+            :loading="detailLoadingId === props.row.id"
             @click="showDetails(props.row)"
           />
         </q-td>
@@ -135,7 +149,12 @@ import {
 } from "quasar";
 import TableFilters from "@/components/table/TableFilters.vue";
 import { Permission } from "@/constants/permissions";
-import { fetchAudits, type AuditEntry } from "@/services/audits";
+import {
+  fetchAudit,
+  fetchAudits,
+  type AuditDetail,
+  type AuditEntry
+} from "@/services/audits";
 import { fetchUsers } from "@/services/users";
 import { useAuthStore } from "@/stores/auth";
 import { sortDirectionFromDescending } from "@/types/table";
@@ -147,6 +166,8 @@ interface AuditFilters {
   from: string;
   to: string;
 }
+
+type UserOption = { label: string; value: number };
 
 const eventOptions = [
   { label: "Criado", value: "created" },
@@ -162,7 +183,8 @@ const auth = useAuthStore();
 const rows = ref<AuditEntry[]>([]);
 const isLoading = ref(false);
 const isLoadingUsers = ref(false);
-const userOptions = ref<{ label: string; value: number }[]>([]);
+const detailLoadingId = ref<number | null>(null);
+const userOptions = ref<UserOption[]>([]);
 
 const draft = reactive<AuditFilters>({
   event: null,
@@ -203,7 +225,9 @@ function formatDate(value: string | null): string {
   return new Date(value).toLocaleString("pt-BR");
 }
 
-function formatRecord(row: AuditEntry): string {
+function formatRecord(
+  row: Pick<AuditEntry, "auditable_label" | "auditable_id">
+): string {
   return `${row.auditable_label} #${row.auditable_id}`;
 }
 
@@ -215,22 +239,41 @@ function formatJson(value: Record<string, unknown> | null): string {
   return JSON.stringify(value, null, 2);
 }
 
-function showDetails(row: AuditEntry): void {
+function openDetailDialog(detail: AuditDetail): void {
   Dialog.create({
-    title: `${row.event_label} · ${formatRecord(row)}`,
+    title: `${detail.event_label} · ${formatRecord(detail)}`,
     message: [
-      `<div class="q-mb-sm"><strong>Quando:</strong> ${formatDate(row.created_at)}</div>`,
-      `<div class="q-mb-sm"><strong>Quem:</strong> ${formatUser(row.user)}</div>`,
-      `<div class="q-mb-sm"><strong>IP:</strong> ${row.ip_address ?? "—"}</div>`,
-      `<div class="q-mb-sm"><strong>URL:</strong> ${row.url ?? "—"}</div>`,
+      `<div class="q-mb-sm"><strong>Quando:</strong> ${formatDate(detail.created_at)}</div>`,
+      `<div class="q-mb-sm"><strong>Quem:</strong> ${formatUser(detail.user)}</div>`,
+      `<div class="q-mb-sm"><strong>IP:</strong> ${detail.ip_address ?? "—"}</div>`,
+      `<div class="q-mb-sm"><strong>URL:</strong> ${detail.url ?? "—"}</div>`,
       `<div class="q-mb-xs"><strong>Antes:</strong></div>`,
-      `<pre class="audit-json">${formatJson(row.old_values)}</pre>`,
+      `<pre class="audit-json">${formatJson(detail.old_values)}</pre>`,
       `<div class="q-mb-xs q-mt-sm"><strong>Depois:</strong></div>`,
-      `<pre class="audit-json">${formatJson(row.new_values)}</pre>`
+      `<pre class="audit-json">${formatJson(detail.new_values)}</pre>`
     ].join(""),
     html: true,
     ok: { label: "Fechar", flat: true, color: "primary" }
   });
+}
+
+async function showDetails(row: AuditEntry): Promise<void> {
+  detailLoadingId.value = row.id;
+
+  try {
+    const detail = await fetchAudit(row.id);
+    openDetailDialog(detail);
+  } catch (error) {
+    Notify.create({
+      type: "negative",
+      message: getApiErrorMessage(
+        error,
+        "Não foi possível carregar os detalhes da auditoria."
+      )
+    });
+  } finally {
+    detailLoadingId.value = null;
+  }
 }
 
 const columns = computed((): QTableColumn[] => {
@@ -351,32 +394,53 @@ function clearFilters(): void {
   applied.user_id = null;
   applied.from = "";
   applied.to = "";
+  userOptions.value = [];
   pagination.value.page = 1;
   void loadAudits();
 }
 
-async function loadUserOptions(): Promise<void> {
+function filterUsers(
+  value: string,
+  update: (callbackFn: () => void) => void
+): void {
   if (!auth.can(Permission.UsersView)) {
+    update(() => {
+      userOptions.value = [];
+    });
+    return;
+  }
+
+  const query = value.trim();
+
+  if (query.length === 0) {
+    update(() => {
+      userOptions.value = [];
+    });
     return;
   }
 
   isLoadingUsers.value = true;
 
-  try {
-    const response = await fetchUsers({ page: 1, per_page: 100 });
-    userOptions.value = response.data.map(user => ({
-      label: `${user.name} (${user.email})`,
-      value: user.id
-    }));
-  } catch {
-    // Select stays empty when users cannot be loaded.
-  } finally {
-    isLoadingUsers.value = false;
-  }
+  void fetchUsers({ page: 1, per_page: 20, q: query })
+    .then(response => {
+      update(() => {
+        userOptions.value = response.data.map(user => ({
+          label: `${user.name} (${user.email})`,
+          value: user.id
+        }));
+      });
+    })
+    .catch(() => {
+      update(() => {
+        userOptions.value = [];
+      });
+    })
+    .finally(() => {
+      isLoadingUsers.value = false;
+    });
 }
 
 onMounted(() => {
-  void loadUserOptions();
   void loadAudits();
 });
 </script>
