@@ -2,7 +2,6 @@
   <q-expansion-item
     v-model="isExpanded"
     class="table-filters q-mb-md"
-    bordered
     dense
     header-class="table-filters__header"
     expand-icon="expand_more"
@@ -23,7 +22,7 @@
       </q-item-section>
     </template>
 
-    <q-card flat>
+    <q-card flat class="table-filters__body">
       <q-card-section>
         <div class="row q-col-gutter-md">
           <slot />
@@ -66,10 +65,32 @@ const isExpanded = ref(false);
 
 <style scoped lang="scss">
 .table-filters {
-  border-radius: 4px;
+  border-radius: 12px;
+  overflow: hidden;
+  // bordered no QExpansionItem não estiliza — borda explícita (light)
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+
+  :deep(.q-expansion-item__container) {
+    border-radius: 12px;
+  }
+
+  :deep(.q-item) {
+    border-radius: 12px;
+    min-height: 48px;
+  }
+
+  // Expandido: canto só em cima no header; corpo fecha embaixo
+  &.q-expansion-item--expanded :deep(.q-item) {
+    border-radius: 12px 12px 0 0;
+  }
 }
 
 .table-filters__header {
   min-height: 48px;
+}
+
+.table-filters__body {
+  border-radius: 0 0 12px 12px;
 }
 </style>

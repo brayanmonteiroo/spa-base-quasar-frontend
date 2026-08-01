@@ -13,41 +13,161 @@
   padding: 24px 32px;
 }
 
-// Garante fundo escuro em todo o layout (page/container)
+// Raio alinhado entre filtros e tabelas
+.q-table__card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+// Fundo dark na mesma família navy do chrome (não preto puro)
 body.body--dark,
 body.body--dark #q-app,
 body.body--dark .q-layout,
 body.body--dark .q-page-container,
 body.body--dark .q-page {
   background: $dark-page;
+  color: $dark-text;
 }
 
-// Hierarquia de contraste no dark mode (página → card → grupos)
 body.body--dark {
-  .form-card {
-    background: #1e1e1e;
-    border-color: rgba(255, 255, 255, 0.18) !important;
+  // Destaques alinhados ao chrome — primary único no dark
+  --q-primary: #{$dark-primary};
+  --q-info: #{$dark-primary};
+  --q-negative: #{$dark-negative};
+  --q-dark: #{$dark};
+  --q-dark-page: #{$dark-page};
+
+  .form-card,
+  .q-card,
+  .q-table__card,
+  .q-dialog__inner > .q-card {
+    background: $dark-surface;
+    border: 1px solid $dark-border;
+    color: $dark-text;
+    box-shadow: none;
   }
 
-  .form-card .q-field--outlined .q-field__control:before {
-    border-color: rgba(255, 255, 255, 0.32);
+  .form-card .q-field--outlined .q-field__control:before,
+  .q-field--outlined .q-field__control:before {
+    border-color: $dark-border;
   }
 
-  .form-card .q-field--outlined:hover .q-field__control:before {
-    border-color: rgba(255, 255, 255, 0.48);
+  .form-card .q-field--outlined:hover .q-field__control:before,
+  .q-field--outlined:hover .q-field__control:before {
+    border-color: lighten($dark-border, 8%);
+  }
+
+  .q-table {
+    background: $dark-surface;
+    color: $dark-text;
+  }
+
+  .q-table th {
+    color: $dark-text-muted;
+    background: darken($dark-surface, 2%);
+  }
+
+  .q-table tbody td {
+    border-color: $dark-border !important;
+  }
+
+  .q-table tbody tr:hover > td {
+    background: $dark-surface-hover !important;
+  }
+
+  .q-table__bottom {
+    border-top: 1px solid $dark-border;
+    color: $dark-text-muted;
+
+    // Setas: Quasar não define cor → herdam cinza fraco no dark
+    .q-table__control .q-btn {
+      color: $dark-text !important;
+      opacity: 1 !important;
+
+      .q-icon,
+      .q-btn__content {
+        color: $dark-text !important;
+        opacity: 1 !important;
+      }
+
+      &:hover:not(.disabled) {
+        color: #ffffff !important;
+
+        .q-icon,
+        .q-btn__content {
+          color: #ffffff !important;
+        }
+      }
+
+      &.disabled,
+      &[disabled] {
+        color: $dark-text-muted !important;
+        opacity: 0.32 !important;
+
+        .q-icon,
+        .q-btn__content {
+          color: $dark-text-muted !important;
+        }
+      }
+    }
+  }
+
+  // Filtros: hover navy da paleta (não cinza Material)
+  .table-filters {
+    background: $dark-surface;
+    border: 1px solid $dark-border;
+
+    .q-item {
+      background: transparent;
+
+      &:hover,
+      &.q-hoverable:hover {
+        background: $dark-surface-hover !important;
+      }
+
+      .q-focus-helper {
+        background: transparent !important;
+        opacity: 0 !important;
+      }
+    }
+
+    .q-card {
+      background: $dark-surface;
+      border: none;
+    }
+  }
+
+  // Tabelas: overflow já no rule global; só reforça no dark
+  .q-table__card {
+    border-radius: 12px;
+  }
+
+  .q-separator {
+    background: $dark-border;
   }
 
   .permission-group {
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    background: #171717;
+    border-color: $dark-border !important;
+    background: darken($dark-surface, 2%);
   }
 
   .permission-group .permission-group__header {
-    background: #2c2c2c !important;
+    background: $dark-surface-hover !important;
   }
 
   .permission-group .permission-group__body {
-    background: #141414;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: $dark-page;
+    border-top: 1px solid $dark-border;
+  }
+
+  // Ícones de ação flat: mesma saturação do primary dark
+  .q-btn--flat.q-btn--round.text-primary .q-icon,
+  .q-btn--flat.text-primary .q-icon {
+    color: $dark-primary;
+  }
+
+  .q-btn--flat.q-btn--round.text-negative .q-icon,
+  .q-btn--flat.text-negative .q-icon {
+    color: $dark-negative;
   }
 }

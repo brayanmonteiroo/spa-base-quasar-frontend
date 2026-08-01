@@ -1,6 +1,6 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated class="bg-primary text-white">
+  <q-layout view="lHh Lpr lFf" class="admin-shell">
+    <q-header :elevated="!isDark" class="admin-shell__chrome text-white">
       <q-toolbar>
         <q-btn
           flat
@@ -58,10 +58,13 @@
       bordered
       :breakpoint="1023"
       :width="260"
+      class="admin-shell__chrome admin-shell__drawer"
     >
       <q-list padding>
         <template v-for="section in visibleSections" :key="section.label">
-          <q-item-label header>{{ section.label }}</q-item-label>
+          <q-item-label header class="admin-shell__section-label">
+            {{ section.label }}
+          </q-item-label>
 
           <q-item
             v-for="link in section.items"
@@ -70,7 +73,8 @@
             v-ripple
             :to="link.to"
             exact
-            active-class="bg-primary text-white"
+            class="admin-shell__nav-item"
+            active-class="admin-shell__nav-item--active"
           >
             <q-item-section avatar>
               <q-icon :name="link.icon" />
@@ -186,3 +190,90 @@ async function onLogout(): Promise<void> {
   }
 }
 </script>
+
+<style lang="scss">
+// Chrome = estrutura (header/sidebar). Primary = destaque (CTAs).
+// Light: navy alto contraste (mantém o visual que já funciona).
+// Dark: azul-acinzentado neutro, sem saturação gritante.
+.admin-shell {
+  --admin-chrome: #0b1f33;
+  --admin-chrome-text: rgba(255, 255, 255, 0.92);
+  --admin-chrome-muted: rgba(255, 255, 255, 0.58);
+  --admin-chrome-hover: rgba(255, 255, 255, 0.1);
+  --admin-nav-active-bg: #ffffff;
+  --admin-nav-active-text: #0b1f33;
+  --admin-nav-active-accent: #{$primary};
+  --admin-drawer-border: rgba(255, 255, 255, 0.12);
+}
+
+body.body--dark .admin-shell {
+  --admin-chrome: #{$dark-chrome};
+  --admin-chrome-text: #{$dark-text};
+  --admin-chrome-muted: #{$dark-text-muted};
+  --admin-chrome-hover: rgba(255, 255, 255, 0.06);
+  --admin-nav-active-bg: #{$dark-chrome-hover};
+  --admin-nav-active-text: #ffffff;
+  --admin-nav-active-accent: #{$dark-primary};
+  --admin-drawer-border: #{$dark-border};
+}
+
+.admin-shell__chrome {
+  background: var(--admin-chrome);
+  color: var(--admin-chrome-text);
+}
+
+// A “luz” não é box-shadow do header — o Quasar injeta .q-layout__shadow.
+// No dark o elevated já fica off (:elevated="!isDark"); isso é rede de segurança.
+body.body--dark .admin-shell .q-header .q-layout__shadow {
+  display: none;
+}
+
+.admin-shell__drawer {
+  background: var(--admin-chrome) !important;
+  border-color: var(--admin-drawer-border) !important;
+
+  .q-drawer__content {
+    background: var(--admin-chrome);
+    color: var(--admin-chrome-text);
+  }
+}
+
+.admin-shell__section-label {
+  color: var(--admin-chrome-muted) !important;
+}
+
+.admin-shell__nav-item {
+  color: var(--admin-chrome-text);
+  border-radius: 8px;
+  margin: 2px 8px;
+
+  .q-icon {
+    color: var(--admin-chrome-text);
+  }
+
+  &:hover {
+    background: var(--admin-chrome-hover);
+  }
+}
+
+.admin-shell__nav-item--active {
+  position: relative;
+  background: var(--admin-nav-active-bg) !important;
+  color: var(--admin-nav-active-text) !important;
+
+  .q-icon {
+    color: var(--admin-nav-active-text) !important;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--admin-nav-active-accent);
+  }
+}
+</style>
