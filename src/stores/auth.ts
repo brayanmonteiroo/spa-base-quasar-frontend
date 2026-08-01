@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { api } from "@/boot/axios";
-import type { Permission } from "@/constants/permissions";
 
 export interface AuthUser {
   id: number;
@@ -28,7 +27,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   const isAuthenticated = computed(() => user.value !== null);
 
-  function can(permission: Permission | string): boolean {
+  function can(permission: string): boolean {
     return user.value?.permissions.includes(permission) ?? false;
   }
 

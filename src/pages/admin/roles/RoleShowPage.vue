@@ -22,7 +22,12 @@
 
     <q-inner-loading :showing="isLoading" />
 
-    <q-card v-if="!isLoading && role" flat bordered class="full-width form-card">
+    <q-card
+      v-if="!isLoading && role"
+      flat
+      bordered
+      class="full-width form-card"
+    >
       <q-card-section>
         <div class="text-subtitle1 text-weight-medium">{{ role.label }}</div>
         <div class="text-caption text-grey-7 q-mb-md">
@@ -103,8 +108,7 @@ const catalogWithSelection = computed(() =>
     modules: section.modules.map(group => ({
       ...group,
       selected: group.permissions.filter(
-        permission =>
-          role.value?.permissions.includes(permission.name) ?? false
+        permission => role.value?.permissions.includes(permission.name) ?? false
       )
     }))
   }))

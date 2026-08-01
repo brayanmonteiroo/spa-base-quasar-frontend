@@ -7,9 +7,7 @@ export function useDarkMode() {
 
   const isDark = computed(() => $q.dark.isActive);
 
-  const icon = computed(() =>
-    $q.dark.isActive ? "light_mode" : "dark_mode"
-  );
+  const icon = computed(() => ($q.dark.isActive ? "light_mode" : "dark_mode"));
 
   function toggle(): void {
     $q.dark.toggle();

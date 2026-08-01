@@ -22,8 +22,8 @@
           <q-card flat bordered>
             <q-card-section>
               <div class="text-subtitle1 text-weight-medium">
-                {{ props.row.event_label }} · {{ props.row.auditable_label }}
-                #{{ props.row.auditable_id }}
+                {{ props.row.event_label }} ·
+                {{ props.row.auditable_label }} #{{ props.row.auditable_id }}
               </div>
               <div class="text-caption text-grey-7">
                 {{ formatUser(props.row.user) }}

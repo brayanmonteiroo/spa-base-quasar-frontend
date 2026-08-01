@@ -58,9 +58,7 @@
                   showPasswordConfirmation ? 'visibility_off' : 'visibility'
                 "
                 class="cursor-pointer"
-                @click="
-                  showPasswordConfirmation = !showPasswordConfirmation
-                "
+                @click="showPasswordConfirmation = !showPasswordConfirmation"
               />
             </template>
           </q-input>

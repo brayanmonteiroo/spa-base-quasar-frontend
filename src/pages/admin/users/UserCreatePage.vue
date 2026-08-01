@@ -134,10 +134,7 @@ onMounted(async () => {
   } catch (error) {
     Notify.create({
       type: "negative",
-      message: getApiErrorMessage(
-        error,
-        "Não foi possível carregar os perfis."
-      )
+      message: getApiErrorMessage(error, "Não foi possível carregar os perfis.")
     });
   } finally {
     isRolesLoading.value = false;

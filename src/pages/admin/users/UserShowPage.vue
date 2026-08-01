@@ -22,7 +22,12 @@
 
     <q-inner-loading :showing="isLoading" />
 
-    <q-card v-if="!isLoading && user" flat bordered class="full-width form-card">
+    <q-card
+      v-if="!isLoading && user"
+      flat
+      bordered
+      class="full-width form-card"
+    >
       <q-card-section>
         <div class="row q-col-gutter-md">
           <div class="col-12 col-md-6">

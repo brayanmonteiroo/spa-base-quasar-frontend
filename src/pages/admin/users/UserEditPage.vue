@@ -222,7 +222,10 @@ async function onSubmit(): Promise<void> {
   } catch (error) {
     Notify.create({
       type: "negative",
-      message: getApiErrorMessage(error, "Não foi possível atualizar o usuário.")
+      message: getApiErrorMessage(
+        error,
+        "Não foi possível atualizar o usuário."
+      )
     });
   } finally {
     isSubmitting.value = false;

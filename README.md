@@ -14,10 +14,10 @@ Não é necessário Node/npm no host para o fluxo diário.
 
 ## Portas (dev)
 
-| Serviço | Host |
-|---------|------|
+| Serviço           | Host                  |
+| ----------------- | --------------------- |
 | Quasar (Vite/HMR) | http://localhost:9020 |
-| API (outro repo) | http://localhost:8097 |
+| API (outro repo)  | http://localhost:8097 |
 
 ## Instalação passo a passo
 
@@ -59,15 +59,15 @@ docker compose -f compose.dev.yaml watch
 
 ## Rotas da SPA
 
-| Rota | Acesso |
-|------|--------|
-| `/` | Login (guest) |
-| `/forgot-password` | Recuperar senha |
-| `/reset-password` | Redefinir senha |
-| `/admin/dashboard` | Autenticado |
-| `/admin/users` | CRUD de usuários |
-| `/admin/users/create` | Criar usuário |
-| `/admin/users/:id/edit` | Editar usuário |
+| Rota                    | Acesso           |
+| ----------------------- | ---------------- |
+| `/`                     | Login (guest)    |
+| `/forgot-password`      | Recuperar senha  |
+| `/reset-password`       | Redefinir senha  |
+| `/admin/dashboard`      | Autenticado      |
+| `/admin/users`          | CRUD de usuários |
+| `/admin/users/create`   | Criar usuário    |
+| `/admin/users/:id/edit` | Editar usuário   |
 
 Guards: guest autenticado → `/admin/dashboard`; `/admin/*` sem sessão → `/`.
 
