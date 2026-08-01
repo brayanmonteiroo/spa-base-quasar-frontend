@@ -1,7 +1,12 @@
 import { defineBoot } from "#q-app";
+import { Notify } from "quasar";
+import type { RouteLocationNormalized } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { api } from "@/boot/axios";
 import { Permission } from "@/constants/permissions";
+
+const FORBIDDEN_PAGE_MESSAGE =
+  "Você não tem permissão para acessar esta página.";
 
 export default defineBoot(({ router }) => {
   const auth = useAuthStore();
@@ -23,6 +28,18 @@ export default defineBoot(({ router }) => {
     }
   );
 
+  function routePermission(route: RouteLocationNormalized): string | undefined {
+    return route.matched
+      .map(record => record.meta.permission)
+      .filter((value): value is string => typeof value === "string")
+      .at(-1);
+  }
+
+  function canAccessRoute(route: RouteLocationNormalized): boolean {
+    const permission = routePermission(route);
+    return permission === undefined || auth.can(permission);
+  }
+
   function firstAllowedAdminRoute(): { name: string } {
     if (auth.can(Permission.DashboardView)) {
       return { name: "admin-dashboard" };
@@ -43,7 +60,17 @@ export default defineBoot(({ router }) => {
     return { name: "login" };
   }
 
-  router.beforeEach(async to => {
+  function notifyForbiddenPage(): void {
+    Notify.create({
+      type: "warning",
+      icon: "lock",
+      message: FORBIDDEN_PAGE_MESSAGE,
+      timeout: 3500,
+      position: "bottom"
+    });
+  }
+
+  router.beforeEach(async (to, from) => {
     if (!auth.isBootstrapped) {
       await auth.fetchUser();
     }
@@ -59,16 +86,24 @@ export default defineBoot(({ router }) => {
       return { name: "login", query: { redirect: to.fullPath } };
     }
 
-    const requiredPermission = to.matched
-      .map(record => record.meta.permission)
-      .filter((value): value is string => typeof value === "string")
-      .at(-1);
+    const requiredPermission = routePermission(to);
 
     if (
       auth.isAuthenticated &&
       requiredPermission !== undefined &&
       !auth.can(requiredPermission)
     ) {
+      notifyForbiddenPage();
+
+      // Já está em tela permitida (ex.: menu com sidebar sem .view) → só avisa
+      if (
+        from.name != null &&
+        from.path.startsWith("/admin") &&
+        canAccessRoute(from)
+      ) {
+        return false;
+      }
+
       const fallback = firstAllowedAdminRoute();
 
       if (fallback.name === to.name) {
