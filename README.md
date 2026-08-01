@@ -87,13 +87,40 @@ docker compose -f compose.dev.yaml logs -f
 # Shell no container
 docker compose -f compose.dev.yaml exec quasar sh
 
-# Lint / typecheck (dentro do container)
+# Lint (formata + oxlint --fix) / typecheck
 docker compose -f compose.dev.yaml exec quasar npm run lint
 docker compose -f compose.dev.yaml exec quasar npm run typecheck
 
 # Parar
 docker compose -f compose.dev.yaml down
 ```
+
+## Lint, typecheck e CI
+
+Checagem completa (mesmo pipeline do GitHub Actions) — no **host** com Node **22+** (recomendado) ou no container:
+
+```bash
+# Host
+npm ci
+npm run ci:check
+
+# Ou no container
+docker compose -f compose.dev.yaml exec quasar npm run ci:check
+```
+
+Scripts npm:
+
+| Script | O que faz |
+|--------|-----------|
+| `npm run lint` | oxfmt (escreve) + oxlint `--fix` |
+| `npm run lint:check` | oxfmt `--check` + oxlint (não altera) |
+| `npm run typecheck` | `vue-tsc --noEmit` |
+| `npm run build` | `quasar build` |
+| `npm run ci:check` | `lint:check` + `typecheck` + `build` |
+
+### GitHub Actions
+
+Workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml): em push/PR para `main`/`master`, Node **22**, `npm ci` e `npm run ci:check`.
 
 ## Estrutura Docker
 
