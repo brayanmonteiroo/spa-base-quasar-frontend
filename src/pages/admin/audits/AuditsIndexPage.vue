@@ -47,10 +47,9 @@
         </q-select>
       </div>
       <div class="col-12 col-sm-6 col-md-3">
-        <q-input
+        <AppDateInput
           v-model="draft.from"
           label="De"
-          type="date"
           dense
           clearable
           outlined
@@ -58,10 +57,9 @@
         />
       </div>
       <div class="col-12 col-sm-6 col-md-3">
-        <q-input
+        <AppDateInput
           v-model="draft.to"
           label="Até"
-          type="date"
           dense
           clearable
           outlined
@@ -149,6 +147,7 @@ import {
   type QTableProps
 } from "quasar";
 import TableFilters from "@/components/table/TableFilters.vue";
+import AppDateInput from "@/components/form/AppDateInput.vue";
 import { Permission } from "@/constants/permissions";
 import {
   fetchAudit,

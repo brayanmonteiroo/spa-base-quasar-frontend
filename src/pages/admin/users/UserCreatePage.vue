@@ -28,26 +28,48 @@
             <div class="col-12 col-md-6">
               <q-input
                 v-model="form.password"
-                type="password"
+                :type="showPassword ? 'text' : 'password'"
                 label="Senha"
                 outlined
                 dense
+                autocomplete="new-password"
                 :rules="[
                   val => (val && val.length >= 8) || 'Mínimo de 8 caracteres'
                 ]"
-              />
+              >
+                <template #append>
+                  <q-icon
+                    :name="showPassword ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="showPassword = !showPassword"
+                  />
+                </template>
+              </q-input>
             </div>
             <div class="col-12 col-md-6">
               <q-input
                 v-model="form.password_confirmation"
-                type="password"
+                :type="showPasswordConfirmation ? 'text' : 'password'"
                 label="Confirmar senha"
                 outlined
                 dense
+                autocomplete="new-password"
                 :rules="[
                   val => val === form.password || 'As senhas não coincidem'
                 ]"
-              />
+              >
+                <template #append>
+                  <q-icon
+                    :name="
+                      showPasswordConfirmation ? 'visibility_off' : 'visibility'
+                    "
+                    class="cursor-pointer"
+                    @click="
+                      showPasswordConfirmation = !showPasswordConfirmation
+                    "
+                  />
+                </template>
+              </q-input>
             </div>
             <div class="col-12 col-md-6">
               <q-select
@@ -115,6 +137,8 @@ const router = useRouter();
 const isSubmitting = ref(false);
 const isRolesLoading = ref(false);
 const roleOptions = ref<RoleOption[]>([]);
+const showPassword = ref(false);
+const showPasswordConfirmation = ref(false);
 
 const form = reactive({
   name: "",
