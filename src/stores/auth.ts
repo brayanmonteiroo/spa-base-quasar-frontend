@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { api } from "@/boot/axios";
+import type { Permission } from "@/constants/permissions";
 
 export interface AuthUser {
   id: number;
@@ -9,6 +10,8 @@ export interface AuthUser {
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
+  roles: string[];
+  permissions: string[];
 }
 
 interface UserResponse {
@@ -24,6 +27,10 @@ export const useAuthStore = defineStore("auth", () => {
   const isBootstrapped = ref(false);
 
   const isAuthenticated = computed(() => user.value !== null);
+
+  function can(permission: Permission | string): boolean {
+    return user.value?.permissions.includes(permission) ?? false;
+  }
 
   async function ensureCsrf(): Promise<void> {
     await api.get("/sanctum/csrf-cookie");
@@ -101,6 +108,7 @@ export const useAuthStore = defineStore("auth", () => {
     user,
     isBootstrapped,
     isAuthenticated,
+    can,
     ensureCsrf,
     fetchUser,
     login,

@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from "vue-router";
+import { Permission } from "@/constants/permissions";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -35,22 +36,50 @@ const routes: RouteRecordRaw[] = [
       {
         path: "dashboard",
         name: "admin-dashboard",
-        component: () => import("@/pages/admin/DashboardPage.vue")
+        component: () => import("@/pages/admin/DashboardPage.vue"),
+        meta: { permission: Permission.DashboardView }
       },
       {
         path: "users",
         name: "admin-users",
-        component: () => import("@/pages/admin/users/UsersIndexPage.vue")
+        component: () => import("@/pages/admin/users/UsersIndexPage.vue"),
+        meta: { permission: Permission.UsersView }
       },
       {
         path: "users/create",
         name: "admin-users-create",
-        component: () => import("@/pages/admin/users/UserCreatePage.vue")
+        component: () => import("@/pages/admin/users/UserCreatePage.vue"),
+        meta: { permission: Permission.UsersCreate }
       },
       {
         path: "users/:id/edit",
         name: "admin-users-edit",
-        component: () => import("@/pages/admin/users/UserEditPage.vue")
+        component: () => import("@/pages/admin/users/UserEditPage.vue"),
+        meta: { permission: Permission.UsersUpdate }
+      },
+      {
+        path: "roles",
+        name: "admin-roles",
+        component: () => import("@/pages/admin/roles/RolesIndexPage.vue"),
+        meta: { permission: Permission.RolesView }
+      },
+      {
+        path: "roles/create",
+        name: "admin-roles-create",
+        component: () => import("@/pages/admin/roles/RoleCreatePage.vue"),
+        meta: { permission: Permission.RolesCreate }
+      },
+      {
+        path: "roles/:id",
+        name: "admin-roles-show",
+        component: () => import("@/pages/admin/roles/RoleShowPage.vue"),
+        meta: { permission: Permission.RolesShow }
+      },
+      {
+        path: "roles/:id/edit",
+        name: "admin-roles-edit",
+        component: () => import("@/pages/admin/roles/RoleEditPage.vue"),
+        meta: { permission: Permission.RolesUpdate }
       }
     ]
   },

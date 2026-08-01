@@ -2,24 +2,24 @@
   <q-page padding>
     <div class="row items-center q-col-gutter-sm q-mb-md">
       <div class="col">
-        <div class="text-h5">Usuários</div>
+        <div class="text-h5">Perfis</div>
       </div>
-      <div v-if="auth.can(Permission.UsersCreate)" class="col-auto">
+      <div v-if="auth.can(Permission.RolesCreate)" class="col-auto">
         <q-btn
           color="primary"
           icon="add"
-          :label="$q.screen.gt.xs ? 'Novo usuário' : undefined"
+          :label="$q.screen.gt.xs ? 'Novo perfil' : undefined"
           :round="$q.screen.lt.sm"
           :dense="$q.screen.lt.sm"
           unelevated
-          aria-label="Novo usuário"
-          :to="{ name: 'admin-users-create' }"
+          aria-label="Novo perfil"
+          :to="{ name: 'admin-roles-create' }"
         />
       </div>
     </div>
 
     <q-table
-      class="users-table full-width"
+      class="roles-table full-width"
       flat
       bordered
       wrap-cells
@@ -40,14 +40,28 @@
               <div class="text-subtitle1 text-weight-medium">
                 {{ props.row.name }}
               </div>
-              <div class="text-caption text-grey-7 ellipsis">
-                {{ props.row.email }}
+              <div class="text-caption text-grey-7">
+                {{ props.row.permissions.length }} permissões ·
+                {{ props.row.users_count }} usuários
               </div>
             </q-card-section>
             <q-separator />
             <q-card-actions align="right">
               <q-btn
-                v-if="auth.can(Permission.UsersUpdate)"
+                v-if="auth.can(Permission.RolesShow)"
+                flat
+                dense
+                round
+                icon="visibility"
+                color="primary"
+                aria-label="Visualizar"
+                :to="{
+                  name: 'admin-roles-show',
+                  params: { id: String(props.row.id) }
+                }"
+              />
+              <q-btn
+                v-if="auth.can(Permission.RolesUpdate)"
                 flat
                 dense
                 round
@@ -55,19 +69,21 @@
                 color="primary"
                 aria-label="Editar"
                 :to="{
-                  name: 'admin-users-edit',
+                  name: 'admin-roles-edit',
                   params: { id: String(props.row.id) }
                 }"
               />
               <q-btn
-                v-if="auth.can(Permission.UsersDelete)"
+                v-if="auth.can(Permission.RolesDelete)"
                 flat
                 dense
                 round
                 icon="delete"
                 color="negative"
                 aria-label="Excluir"
-                :disable="props.row.id === auth.user?.id"
+                :disable="
+                  props.row.name === 'admin' || props.row.users_count > 0
+                "
                 @click="confirmDelete(props.row)"
               />
             </q-card-actions>
@@ -78,7 +94,20 @@
       <template #body-cell-actions="props">
         <q-td :props="props">
           <q-btn
-            v-if="auth.can(Permission.UsersUpdate)"
+            v-if="auth.can(Permission.RolesShow)"
+            flat
+            dense
+            round
+            icon="visibility"
+            color="primary"
+            aria-label="Visualizar"
+            :to="{
+              name: 'admin-roles-show',
+              params: { id: String(props.row.id) }
+            }"
+          />
+          <q-btn
+            v-if="auth.can(Permission.RolesUpdate)"
             flat
             dense
             round
@@ -86,19 +115,19 @@
             color="primary"
             aria-label="Editar"
             :to="{
-              name: 'admin-users-edit',
+              name: 'admin-roles-edit',
               params: { id: String(props.row.id) }
             }"
           />
           <q-btn
-            v-if="auth.can(Permission.UsersDelete)"
+            v-if="auth.can(Permission.RolesDelete)"
             flat
             dense
             round
             icon="delete"
             color="negative"
             aria-label="Excluir"
-            :disable="props.row.id === auth.user?.id"
+            :disable="props.row.name === 'admin' || props.row.users_count > 0"
             @click="confirmDelete(props.row)"
           />
         </q-td>
@@ -116,26 +145,18 @@ import {
   type QTableColumn,
   type QTableProps
 } from "quasar";
-import { useAuthStore, type AuthUser } from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth";
 import { Permission } from "@/constants/permissions";
-import { deleteUser, fetchUsers } from "@/services/users";
+import { deleteRole, fetchRoles, type Role } from "@/services/roles";
 import { getApiErrorMessage } from "@/utils/api-error";
 
 const $q = useQuasar();
 const auth = useAuthStore();
-const rows = ref<AuthUser[]>([]);
+const rows = ref<Role[]>([]);
 const isLoading = ref(false);
 
 const columns = computed((): QTableColumn[] => {
   const cols: QTableColumn[] = [
-    {
-      name: "id",
-      label: "ID",
-      field: "id",
-      align: "left",
-      sortable: true,
-      style: "width: 72px"
-    },
     {
       name: "name",
       label: "Nome",
@@ -144,24 +165,25 @@ const columns = computed((): QTableColumn[] => {
       sortable: true
     },
     {
-      name: "email",
-      label: "E-mail",
-      field: "email",
-      align: "left",
-      sortable: true
+      name: "permissions",
+      label: "Permissões",
+      field: (row: Role) => row.permissions.length,
+      align: "left"
+    },
+    {
+      name: "users_count",
+      label: "Usuários",
+      field: "users_count",
+      align: "left"
     },
     {
       name: "actions",
       label: "Ações",
       field: "actions",
       align: "right",
-      style: "width: 100px"
+      style: "width: 140px"
     }
   ];
-
-  if ($q.screen.lt.md) {
-    return cols.filter(column => column.name !== "id");
-  }
 
   return cols;
 });
@@ -174,14 +196,14 @@ const pagination = ref({
   rowsNumber: 0
 });
 
-async function loadUsers(
+async function loadRoles(
   page = pagination.value.page,
   rowsPerPage = pagination.value.rowsPerPage
 ): Promise<void> {
   isLoading.value = true;
 
   try {
-    const response = await fetchUsers(page, rowsPerPage);
+    const response = await fetchRoles(page, rowsPerPage);
     rows.value = response.data;
     pagination.value.page = response.meta.current_page;
     pagination.value.rowsPerPage = response.meta.per_page;
@@ -189,10 +211,7 @@ async function loadUsers(
   } catch (error) {
     Notify.create({
       type: "negative",
-      message: getApiErrorMessage(
-        error,
-        "Não foi possível carregar os usuários."
-      )
+      message: getApiErrorMessage(error, "Não foi possível carregar os perfis.")
     });
   } finally {
     isLoading.value = false;
@@ -204,27 +223,27 @@ const onRequest: QTableProps["onRequest"] = ({ pagination: next }) => {
     ...pagination.value,
     ...next
   };
-  void loadUsers(next.page, next.rowsPerPage);
+  void loadRoles(next.page, next.rowsPerPage);
 };
 
-function confirmDelete(user: AuthUser): void {
+function confirmDelete(role: Role): void {
   Dialog.create({
-    title: "Excluir usuário",
-    message: `Remover ${user.name}? Esta ação não pode ser desfeita.`,
+    title: "Excluir perfil",
+    message: `Remover o perfil ${role.name}? Esta ação não pode ser desfeita.`,
     cancel: true,
     persistent: true
   }).onOk(() => {
     void (async () => {
       try {
-        await deleteUser(user.id);
-        Notify.create({ type: "positive", message: "Usuário removido." });
-        await loadUsers();
+        await deleteRole(role.id);
+        Notify.create({ type: "positive", message: "Perfil removido." });
+        await loadRoles();
       } catch (error) {
         Notify.create({
           type: "negative",
           message: getApiErrorMessage(
             error,
-            "Não foi possível excluir o usuário."
+            "Não foi possível excluir o perfil."
           )
         });
       }
@@ -233,12 +252,12 @@ function confirmDelete(user: AuthUser): void {
 }
 
 onMounted(() => {
-  void loadUsers();
+  void loadRoles();
 });
 </script>
 
 <style scoped lang="scss">
-.users-table {
+.roles-table {
   :deep(.q-table__bottom) {
     flex-wrap: wrap;
     gap: 8px;

@@ -86,11 +86,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Notify, useQuasar } from "quasar";
 import { useAuthStore } from "@/stores/auth";
 import { useDarkMode } from "@/composables/useDarkMode";
+import { Permission } from "@/constants/permissions";
 import { getApiErrorMessage } from "@/utils/api-error";
 
 const auth = useAuthStore();
@@ -100,10 +101,30 @@ const route = useRoute();
 const $q = useQuasar();
 const leftDrawerOpen = ref(false);
 
-const links = [
-  { label: "Painel", icon: "dashboard", to: { name: "admin-dashboard" } },
-  { label: "Usuários", icon: "people", to: { name: "admin-users" } }
+const allLinks = [
+  {
+    label: "Painel",
+    icon: "dashboard",
+    to: { name: "admin-dashboard" },
+    permission: Permission.DashboardSidebar
+  },
+  {
+    label: "Usuários",
+    icon: "people",
+    to: { name: "admin-users" },
+    permission: Permission.UsersSidebar
+  },
+  {
+    label: "Perfis",
+    icon: "badge",
+    to: { name: "admin-roles" },
+    permission: Permission.RolesSidebar
+  }
 ] as const;
+
+const links = computed(() =>
+  allLinks.filter(link => auth.can(link.permission))
+);
 
 watch(
   () => route.fullPath,
